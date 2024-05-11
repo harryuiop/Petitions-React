@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from "react";
-import Petition from "../types/petition";
 import {defaultPetition} from "../utils/defaultPetitionState";
 import {API_BASE_URL} from "../config";
 import axios from "axios";
 import {useParams} from "react-router-dom";
 import {Box, Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Typography} from "@mui/material";
+import {PetitionFromGetOne} from "petition";
 
 
 const PetitionCard = () => {
     const {id} = useParams();
-    const [petition, setPetition] = useState<Petition>(defaultPetition);
+    const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetition);
     const [petitionImage, setPetitionImage] = useState("");
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -70,9 +70,10 @@ const PetitionCard = () => {
                             {petition.creationDate}
                         </Typography>
                         <Typography variant="body2">
-                            Created by {petition.onwerFirstName} {petition.ownerLastName}
+                            Created by {petition.ownerFirstName} {petition.ownerLastName}
                         </Typography>
                         <Typography variant="body2">
+                            // ToDo: supporting cost (of the minimum tier)
                             {petition.categoryId}
                         </Typography>
                     </CardContent>
@@ -90,9 +91,3 @@ const PetitionCard = () => {
     }
 
 export default PetitionCard
-
-// • Hero image,
-// • title,
-// • creation date,
-// • category,
-// • owner (first and last name and hero image), • supporting cost (of the minimum tier).

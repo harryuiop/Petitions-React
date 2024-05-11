@@ -6,7 +6,7 @@ declare module 'petition' {
         cost: number;
     }
 
-    export interface Petition {
+    export interface PetitionFromGetOne {
         description: string;
         moneyRaised: number;
         supportTiers: Supporter[];
@@ -19,6 +19,16 @@ declare module 'petition' {
         numberOfSupporters: number;
         creationDate: string;
     }
-}
 
-export default Petition
+    export interface PetitionFromGetAll {
+        petitionId: string;
+        title: number;
+        categoryId: number;
+        creationDate: string;
+        ownerId: number;
+        ownerFirstName: string;
+        ownerLastName: string;
+        numberOfSupporters: number;
+        supportingCost: number
+    }
+}

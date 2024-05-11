@@ -13,7 +13,7 @@ function App() {
         <Router>
           <div>
             <Routes>
-              <Route path="/petition/:id" element={<PetitionTable />} />
+              <Route path="/petition" element={<PetitionTable />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

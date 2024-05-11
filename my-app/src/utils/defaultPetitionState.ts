@@ -1,6 +1,6 @@
-import Petition from "../types/petition"
+import {PetitionFromGetOne} from "petition";
 
-export const defaultPetition: Petition = {
+export const defaultPetition: PetitionFromGetOne = {
     description: '',
     moneyRaised: 0,
     supportTiers: [],
