@@ -1,0 +1,5 @@
+2024-05-11 15:02:01:21 [31merror[39m: [31mUnable to connect to MySQL.[39m
+2024-05-11 15:04:23:423 [31merror[39m: [31mUnable to connect to MySQL.[39m
+2024-05-11 15:04:29:429 [31merror[39m: [31mUnable to connect to MySQL.[39m
+2024-05-11 15:06:25:625 [32minfo[39m: [32mSuccessfully connected to database[39m
+2024-05-11 15:06:25:625 [32minfo[39m: [32mListening on port: 4941[39m
