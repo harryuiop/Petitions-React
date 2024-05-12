@@ -7,7 +7,7 @@ import {Box, Button, Card, CardActionArea, CardActions, CardContent, CardMedia, 
 import {PetitionFromGetOne} from "petition";
 import {grey} from "@mui/material/colors";
 
-const PetitionCard = ( props: { petitionId: String; } ) => {
+const PetitionCard = ( props: { petitionId: String } ) => {
     const [id, setId] = useState(props.petitionId);
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [petitionImage, setPetitionImage] = useState("");
@@ -15,7 +15,6 @@ const PetitionCard = ( props: { petitionId: String; } ) => {
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
-
         const getPetitionInformation = () => {
             axios.get(API_BASE_URL + '/petitions/' + id)
                 .then((response) => {
@@ -52,6 +51,9 @@ const PetitionCard = ( props: { petitionId: String; } ) => {
         getPetitionInformation()
         }, [id]);
 
+        // const handleSearch = (query: string) => {
+        //     setSearchQuery(query);
+        // };
 
     return (
             <Card sx={{ display: 'flex', maxWidth: 900, minWidth: 800, minHeight: 200,
@@ -81,7 +83,7 @@ const PetitionCard = ( props: { petitionId: String; } ) => {
                 </CardActionArea>
                 <CardMedia
                     component="img"
-                    sx={{ height: 200, width: 200, objectFit: "cover" }} 
+                    sx={{ height: 200, width: 200, objectFit: "cover" }}
                     image={petitionImage}
                     alt="Petition image"
                 />

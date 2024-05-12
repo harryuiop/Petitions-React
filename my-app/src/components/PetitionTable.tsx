@@ -5,15 +5,16 @@ import { API_BASE_URL } from "../config";
 import { PetitionFromGetAll } from "petition";
 import PetitionCard from "./PetitionCard";
 
-const PetitionTable = () => {
+const PetitionTable = ( { searchInput }: { searchInput: String } ) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [allPetitions, setAllPetitions] = useState<PetitionFromGetAll[]>([]);
-    const [loading, setLoading] = useState(true); // Add loading state
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
+        console.log('searchInput received in PetitionTable:', searchInput);
+
         const fetchAllPetitions = async () => {
             try {
                 const response = await axios.get(API_BASE_URL + '/petitions');
@@ -23,13 +24,10 @@ const PetitionTable = () => {
             } catch (error: any) {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());
-            } finally {
-                setLoading(false);
             }
-        }
-
+        };
         fetchAllPetitions();
-    }, []);
+    }, [searchInput]);
 
     const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
         setPage(newPage);
@@ -45,20 +43,33 @@ const PetitionTable = () => {
             <TableContainer>
                 <Table aria-label="custom pagination table">
                     <TableBody>
-                        {!loading && allPetitions.length > 0 ? (
+                        {allPetitions.length > 0 ? (
                             (rowsPerPage > 0
-                                    ? allPetitions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    : allPetitions
+                                    ? allPetitions
+                                        .filter((petition) =>
+                                            petition.title
+                                                .toLowerCase()
+                                                .includes(searchInput.toLowerCase())
+                                        )
+                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    : allPetitions.filter((petition) =>
+                                        petition.title
+                                            .toLowerCase()
+                                            .includes(searchInput.toLowerCase())
+                                    )
                             ).map((currentPetition) => (
                                 <TableRow key={currentPetition.title}>
                                     <TableCell component="th" scope="row">
-                                        <PetitionCard key={currentPetition.petitionId} petitionId={currentPetition.petitionId} />
+                                        <PetitionCard
+                                            key={currentPetition.petitionId}
+                                            petitionId={currentPetition.petitionId}
+                                        />
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell>{loading ? 'Loading...' : 'No petitions available'}</TableCell>
+                                <TableCell>{'No petitions available'}</TableCell>
                             </TableRow>
                         )}
                     </TableBody>

@@ -1,14 +1,14 @@
 import {AppBar, Toolbar, Typography, Stack, Button} from "@mui/material";
 import {Link, useNavigate} from 'react-router-dom';
 import {blue, grey} from "@mui/material/colors";
-import { useState } from "react";
+import React, { useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
 import SearchBar from "./SearchBar";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 
-const NavBar = () => {
+const NavBar = ( { callbackSearchInput, searchInput } : { callbackSearchInput : React.Dispatch<React.SetStateAction<string>>, searchInput: String }) => {
 
     return (
         <AppBar>
@@ -21,7 +21,7 @@ const NavBar = () => {
                         PetitionPoint
                     </Typography>
                 </Stack>
-                <SearchBar />
+                <SearchBar callbackSearchInput={callbackSearchInput} searchInput={searchInput}/>
                 <Stack direction="row" spacing={2}>
                     <Button component={Link} to="/signin"> Sign in </Button>
                     <Button component={Link} to="/register"> Profile </Button>
