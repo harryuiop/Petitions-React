@@ -7,8 +7,8 @@ import {Box, Button, Card, CardActionArea, CardActions, CardContent, CardMedia, 
 import {PetitionFromGetOne} from "petition";
 
 
-const PetitionCard = () => {
-    const {id} = useParams();
+const PetitionCard = ( props: { petitionId: String; } ) => {
+    const [id, setId] = useState(props.petitionId);
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetition);
     const [petitionImage, setPetitionImage] = useState("");
     const [errorFlag, setErrorFlag] = useState(false);

@@ -1,11 +1,10 @@
 import React from 'react';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import Home from "./components/Home";
 import NotFound from "./components/NotFound";
-import PetitionCard from "./components/PetitionCard";
 import './globalStyles.css';
 import './App.css';
-import PetitionTable from "./components/PetitionTable";
+import NavBar from "./components/NavBar";
+import Home from "./components/Home";
 
 function App() {
   return (
@@ -13,7 +12,7 @@ function App() {
         <Router>
           <div>
             <Routes>
-              <Route path="/petition" element={<PetitionTable />} />
+              <Route path="/" element={<Home />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
