@@ -1,18 +1,20 @@
-import React, {useEffect, useState} from "react";
-import {defaultPetitionFromGetOne} from "../utils/defaultPetitionState";
-import {API_BASE_URL} from "../config";
+import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config";
 import axios from "axios";
-import {useParams} from "react-router-dom";
-import {Box, Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Typography} from "@mui/material";
-import {PetitionFromGetOne} from "petition";
-import {grey} from "@mui/material/colors";
+import { useParams } from "react-router-dom";
+import { Box, Card, CardActionArea, CardContent, CardMedia, Skeleton, Typography } from "@mui/material";
+import {PetitionFromGetOne, Supporter} from "petition";
+import { grey } from "@mui/material/colors";
+import SkeletonCard from "./SkeletonCard";
+import {defaultPetitionFromGetOne} from "../utils/defaultPetitionState";
 
-const PetitionCard = ( props: { petitionId: String } ) => {
+const PetitionCard = (props: { petitionId: String }) => {
     const [id, setId] = useState(props.petitionId);
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [petitionImage, setPetitionImage] = useState("");
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const getPetitionInformation = () => {
@@ -28,7 +30,7 @@ const PetitionCard = ( props: { petitionId: String } ) => {
         }
 
         const getPetitionImage = () => {
-            axios.get(API_BASE_URL + '/petitions/' + id + '/image', { responseType: 'arraybuffer' })
+             axios.get(API_BASE_URL + '/petitions/' + id + '/image', { responseType: 'arraybuffer' })
                 .then((response) => {
                     setErrorFlag(false);
                     setErrorMessage("");
@@ -47,48 +49,50 @@ const PetitionCard = ( props: { petitionId: String } ) => {
                 });
         }
 
-        getPetitionImage()
-        getPetitionInformation()
-        }, [id]);
-
-        // const handleSearch = (query: string) => {
-        //     setSearchQuery(query);
-        // };
+        getPetitionImage();
+        getPetitionInformation();
+        setIsLoading(false);
+    }, [id]);
 
     return (
-            <Card sx={{ display: 'flex', maxWidth: 900, minWidth: 800, minHeight: 200,
-                transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
-                '&:hover': {
-                    backgroundColor: grey[600],
-                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-                }, }}>
-                <CardActionArea>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <CardContent sx={{ flex: '1 0 auto' }}>
-                        <Typography component="div" variant="h5">
-                            {petition.title}
-                        </Typography>
-                        <Typography variant="body2">
-                            {petition.creationDate}
-                        </Typography>
-                        <Typography variant="body2">
-                            Created by {petition.ownerFirstName} {petition.ownerLastName}
-                        </Typography>
-                        <Typography variant="body2">
-                            // ToDo: supporting cost (of the minimum tier)
-                            {petition.categoryId}
-                        </Typography>
-                    </CardContent>
-                </Box>
-                </CardActionArea>
-                <CardMedia
-                    component="img"
-                    sx={{ height: 200, width: 200, objectFit: "cover" }}
-                    image={petitionImage}
-                    alt="Petition image"
-                />
-            </Card>
-        );
-    }
+        <>
+            {isLoading ? (
+                <SkeletonCard />
+            ) : (
+                <Card sx={{ display: 'flex', maxWidth: 900, minWidth: 800, minHeight: 200,
+                    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+                    '&:hover': {
+                        backgroundColor: grey[600],
+                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+                    }, }}>
+                    <CardActionArea>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <CardContent sx={{ flex: '1 0 auto' }}>
+                                <Typography component="div" variant="h5">
+                                    {petition.title}
+                                </Typography>
+                                <Typography variant="body2">
+                                    {petition.creationDate}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Created by {petition.ownerFirstName} {petition.ownerLastName}
+                                </Typography>
+                                <Typography variant="body2">
+                                    {petition.categoryId}
+                                </Typography>
+                            </CardContent>
+                        </Box>
+                    </CardActionArea>
+                    <CardMedia
+                        component="img"
+                        sx={{ height: 200, width: 200, objectFit: "cover" }}
+                        image={petitionImage}
+                        alt="Petition image"
+                    />
+                </Card>
+            )}
+        </>
+    );
+}
 
-export default PetitionCard
+export default PetitionCard;

@@ -4,6 +4,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../config";
 import { PetitionFromGetAll } from "petition";
 import PetitionCard from "./PetitionCard";
+import SkeletonCard from './SkeletonCard';
 
 const PetitionTable = ( { searchInput }: { searchInput: String } ) => {
     const [page, setPage] = useState(0);
@@ -11,12 +12,12 @@ const PetitionTable = ( { searchInput }: { searchInput: String } ) => {
     const [allPetitions, setAllPetitions] = useState<PetitionFromGetAll[]>([]);
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(true); // Add this line
 
     useEffect(() => {
-        console.log('searchInput received in PetitionTable:', searchInput);
-
         const fetchAllPetitions = async () => {
             try {
+                setIsLoading(true);
                 const response = await axios.get(API_BASE_URL + '/petitions');
                 setAllPetitions(response.data.petitions);
                 setErrorFlag(false);
@@ -24,6 +25,8 @@ const PetitionTable = ( { searchInput }: { searchInput: String } ) => {
             } catch (error: any) {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchAllPetitions();
@@ -43,7 +46,13 @@ const PetitionTable = ( { searchInput }: { searchInput: String } ) => {
             <TableContainer>
                 <Table aria-label="custom pagination table">
                     <TableBody>
-                        {allPetitions.length > 0 ? (
+                        {isLoading ? (
+                            <TableRow>
+                                <TableCell component="th" scope="row">
+                                    <SkeletonCard />
+                                </TableCell>
+                            </TableRow>
+                        ) : allPetitions.length > 0 ? (
                             (rowsPerPage > 0
                                     ? allPetitions
                                         .filter((petition) =>
