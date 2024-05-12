@@ -1,6 +1,6 @@
 import {PetitionFromGetOne} from "petition";
 
-export const defaultPetition: PetitionFromGetOne = {
+export const defaultPetitionFromGetOne: PetitionFromGetOne = {
     description: '',
     moneyRaised: 0,
     supportTiers: [],

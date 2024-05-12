@@ -3,8 +3,9 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import NotFound from "./components/NotFound";
 import './globalStyles.css';
 import './App.css';
-import NavBar from "./components/NavBar";
 import Home from "./components/Home";
+import SignIn from "./components/SignIn";
+import Register from "./components/register";
 
 function App() {
   return (
@@ -12,7 +13,9 @@ function App() {
         <Router>
           <div>
             <Routes>
-              <Route path="/" element={<Home />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/register" element={<Register />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

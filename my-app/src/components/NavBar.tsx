@@ -1,19 +1,30 @@
-import {AppBar, Toolbar, IconButton, Typography, Stack, Button, styled, ButtonProps} from "@mui/material";
+import {AppBar, Toolbar, Typography, Stack, Button} from "@mui/material";
 import {Link, useNavigate} from 'react-router-dom';
-import AirlineStopsIcon from '@mui/icons-material/AirlineStops';
-import {grey} from "@mui/material/colors";
+import {blue, grey} from "@mui/material/colors";
+import { useState } from "react";
+import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
+import TextField from "@mui/material/TextField";
+import SearchBar from "./SearchBar";
+import HandshakeIcon from "@mui/icons-material/Handshake";
 
 const NavBar = () => {
+
     return (
-        <AppBar sx={{backgroundColor: grey[100]}}>
-            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                <Typography variant="h6" color="#1e78d2" component="div">
-                    PetitionPoint
-                </Typography>
+        <AppBar>
+            <Toolbar sx={{ marginLeft: 10, marginRight: 10, display: 'flex', justifyContent: 'space-between'}}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                    <IconButton component={Link} to="/" size="large" edge='start' sx={{ color: blue[300] }}>
+                        <HandshakeIcon/>
+                    </IconButton>
+                    <Typography variant="h6" color={grey[200]} component="div">
+                        PetitionPoint
+                    </Typography>
+                </Stack>
+                <SearchBar />
                 <Stack direction="row" spacing={2}>
-                    <Button> Login </Button>
-                    <Button> Browser </Button>
-                    <Button> Profile </Button>
+                    <Button component={Link} to="/signin"> Sign in </Button>
+                    <Button component={Link} to="/register"> Profile </Button>
                 </Stack>
             </Toolbar>
         </AppBar>

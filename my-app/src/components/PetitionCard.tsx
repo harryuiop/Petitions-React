@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from "react";
-import {defaultPetition} from "../utils/defaultPetitionState";
+import {defaultPetitionFromGetOne} from "../utils/defaultPetitionState";
 import {API_BASE_URL} from "../config";
 import axios from "axios";
 import {useParams} from "react-router-dom";
 import {Box, Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Typography} from "@mui/material";
 import {PetitionFromGetOne} from "petition";
-
+import {grey} from "@mui/material/colors";
 
 const PetitionCard = ( props: { petitionId: String; } ) => {
     const [id, setId] = useState(props.petitionId);
-    const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetition);
+    const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [petitionImage, setPetitionImage] = useState("");
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -54,11 +54,11 @@ const PetitionCard = ( props: { petitionId: String; } ) => {
 
 
     return (
-            <Card sx={{ display: 'flex', maxWidth: 500,
+            <Card sx={{ display: 'flex', maxWidth: 900, minWidth: 800, minHeight: 200,
                 transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
                 '&:hover': {
-                    backgroundColor: '#f0f0f0', // Change background color on hover
-                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)', // Add box shadow on hover
+                    backgroundColor: grey[600],
+                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
                 }, }}>
                 <CardActionArea>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -79,10 +79,9 @@ const PetitionCard = ( props: { petitionId: String; } ) => {
                     </CardContent>
                 </Box>
                 </CardActionArea>
-
                 <CardMedia
                     component="img"
-                    sx={{ width: 151 }}
+                    sx={{ height: 200, width: 200, objectFit: "cover" }} 
                     image={petitionImage}
                     alt="Petition image"
                 />

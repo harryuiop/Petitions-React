@@ -41,7 +41,7 @@ const PetitionTable = () => {
     }
 
     return (
-        <Paper sx={{ minWidth: 400, maxWidth: 530 }}>
+        <Paper sx={{ minWidth: 700, maxWidth: 930 }}>
             <TableContainer>
                 <Table aria-label="custom pagination table">
                     <TableBody>
