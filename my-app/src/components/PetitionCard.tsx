@@ -7,14 +7,15 @@ import {PetitionFromGetOne, Supporter} from "petition";
 import { grey } from "@mui/material/colors";
 import SkeletonCard from "./SkeletonCard";
 import {defaultPetitionFromGetOne} from "../utils/defaultPetitionState";
+import {blob} from "node:stream/consumers";
 
-const PetitionCard = (props: { petitionId: String }) => {
-    const [id, setId] = useState(props.petitionId);
+const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
+    const [id, setId] = useState(petitionId);
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [petitionImage, setPetitionImage] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const getPetitionInformation = () => {
@@ -29,24 +30,19 @@ const PetitionCard = (props: { petitionId: String }) => {
                 });
         }
 
-        const getPetitionImage = () => {
-             axios.get(API_BASE_URL + '/petitions/' + id + '/image', { responseType: 'arraybuffer' })
-                .then((response) => {
-                    setErrorFlag(false);
-                    setErrorMessage("");
-                    const base64Image = btoa(
-                        new Uint8Array(response.data).reduce(
-                            (data, byte) => data + String.fromCharCode(byte),
-                            ''
-                        )
-                    );
-                    const imageDataUrl = `data:image/jpeg;base64,${base64Image}`;
-                    setPetitionImage(imageDataUrl);
-                })
-                .catch((error) => {
-                    setErrorFlag(true);
-                    setErrorMessage(error.toString());
+        const getPetitionImage = async () => {
+            try {
+                const response = await axios.get(API_BASE_URL + '/petitions/' + id + '/image', {
+                    responseType: 'blob'
                 });
+                setErrorFlag(false);
+                setErrorMessage("");
+                const url = URL.createObjectURL(response.data);
+                setPetitionImage(url);
+            } catch (error: any) {
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
+            }
         }
 
         getPetitionImage();
@@ -86,8 +82,8 @@ const PetitionCard = (props: { petitionId: String }) => {
                     <CardMedia
                         component="img"
                         sx={{ height: 200, width: 200, objectFit: "cover" }}
-                        image={petitionImage}
-                        alt="Petition image"
+                        src={petitionImage}
+                        alt="petition-image"
                     />
                 </Card>
             )}

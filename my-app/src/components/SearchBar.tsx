@@ -7,7 +7,6 @@ const SearchBar = ({ callbackSearchInput, searchInput }: { callbackSearchInput: 
 
     const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
-        console.log('SearchInput changed in SearchBar:', inputValue);
         callbackSearchInput(inputValue);
     };
 

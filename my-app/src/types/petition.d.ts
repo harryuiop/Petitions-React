@@ -21,7 +21,7 @@ declare module 'petition' {
     }
 
     export interface PetitionFromGetAll {
-        petitionId: string;
+        petitionId: number;
         title: string;
         categoryId: number;
         creationDate: string;

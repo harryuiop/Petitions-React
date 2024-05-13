@@ -1,25 +1,23 @@
 import NavBar from "./NavBar";
-import PetitionTable from "./PetitionTable";
+import InnerPetitionTable from "./InnerPetitionTable";
 import { Box, Typography } from "@mui/material";
-import {grey} from "@mui/material/colors";
-import {useEffect, useState} from "react";
+import { grey } from "@mui/material/colors";
+import { useEffect, useState } from "react";
+import OutterPetitionTable from "./OutterPetitionTable";
 
 const Home = () => {
     const [searchInput, setSearchInput] = useState("");
 
-    useEffect(() => {
-        console.log('searchInput updated in home:', searchInput); // Add this line
-    }, [searchInput]);
-
     return (
         <div>
-            <NavBar callbackSearchInput={setSearchInput} searchInput={searchInput}/>
-            <Box mt={10}>
+            <NavBar callbackSearchInput={setSearchInput} searchInput={searchInput} />
+            <Box mt={10} >
                 <Typography variant="h4" color={grey[200]} align="center" sx={{ padding: 3 }}>
                     Featured Petitions
                 </Typography>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                    <PetitionTable searchInput={searchInput} />
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    {/*<InnerPetitionTable searchInput={searchInput} />*/}
+                    <OutterPetitionTable searchInput={searchInput} />
                 </Box>
             </Box>
         </div>
