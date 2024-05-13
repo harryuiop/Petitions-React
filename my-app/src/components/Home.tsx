@@ -10,7 +10,7 @@ const Home = () => {
 
     return (
         <div>
-            <NavBar callbackSearchInput={setSearchInput} searchInput={searchInput} />
+            <NavBar callbackSearchInput={setSearchInput} searchInput={searchInput} includeSearchBar={true} />
             <Box mt={10} >
                 <Typography variant="h4" color={grey[200]} align="center" sx={{ padding: 3 }}>
                     Find Petitions

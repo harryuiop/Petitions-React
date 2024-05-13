@@ -73,11 +73,16 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
     useEffect(() => {
         const filteredPetitions = allPetitionsFromGetOne.filter((petition) => {
             const categoryString = petitionCategory[petition.categoryId];
+            if (maxSupporterCost !== "") {
+                return Math.max(...petition.supportTiers.map(obj => obj.cost)) <= parseInt(maxSupporterCost,10);
+            }
+
             if (selectedOptions.includes(categoryString)) {
                 return (petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
                     petition.description.toLowerCase().includes(searchInput.toLowerCase()))
-                    // (Math.max(...petition.supportTiers.map(obj => obj.cost)) > parseInt(maxSupporterCost, 10));
-
+            } else if (selectedOptions.length === 0){
+                return (petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    petition.description.toLowerCase().includes(searchInput.toLowerCase()))
             } else if (selectedOptions.length === 0) {
                 return true;
             }

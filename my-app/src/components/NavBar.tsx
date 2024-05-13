@@ -8,7 +8,7 @@ import TextField from "@mui/material/TextField";
 import SearchBar from "./SearchBar";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 
-const NavBar = ( { callbackSearchInput, searchInput } : { callbackSearchInput : React.Dispatch<React.SetStateAction<string>>, searchInput: string }) => {
+const NavBar = ( { callbackSearchInput, searchInput, includeSearchBar } : { callbackSearchInput : React.Dispatch<React.SetStateAction<string>>, searchInput: string, includeSearchBar: boolean }) => {
 
     return (
         <AppBar>
@@ -21,7 +21,7 @@ const NavBar = ( { callbackSearchInput, searchInput } : { callbackSearchInput : 
                         PetitionPoint
                     </Typography>
                 </Stack>
-                <SearchBar callbackSearchInput={callbackSearchInput} searchInput={searchInput}/>
+                {includeSearchBar ? <SearchBar callbackSearchInput={callbackSearchInput} searchInput={searchInput}/> : <></>}
                 <Stack direction="row" spacing={2}>
                     <Button component={Link} to="/signin"> Sign in </Button>
                     <Button component={Link} to="/register"> Profile </Button>

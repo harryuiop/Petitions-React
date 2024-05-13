@@ -6,6 +6,7 @@ import './App.css';
 import Home from "./components/Home";
 import SignIn from "./components/SignIn";
 import Register from "./components/register";
+import ExplorePetition from "./components/ExplorePetition"
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <div>
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/petition/:id" element={<ExplorePetition />} />
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="*" element={<NotFound />} />

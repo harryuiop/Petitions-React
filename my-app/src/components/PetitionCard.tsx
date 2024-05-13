@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL } from "../config";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import { Box, Card, CardActionArea, CardContent, CardMedia, Skeleton, Typography } from "@mui/material";
 import {PetitionFromGetOne, Supporter} from "petition";
 import { grey } from "@mui/material/colors";
@@ -93,67 +93,69 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
             {isLoading ? (
                 <SkeletonCard />
             ) : (
-                <Card sx={{ display: 'flex', maxWidth: 900, minWidth: 800, minHeight: 200,
-                    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
-                    '&:hover': {
-                        backgroundColor: grey[600],
-                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-                    }, }}>
-                    <CardActionArea>
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <CardContent sx={{flex: '1 0 auto'}}>
-                                <Typography component="div" variant="h5">
-                                    {petition.title}
-                                </Typography>
-                                <Typography variant="body2">
-                                    {petition.creationDate}
-                                </Typography>
-                                <Typography variant="body2">
-                                    {"Minimum Support Cost: $"}{minSupportTierCost}
-                                </Typography>
-                                <Typography variant="body2">
-                                    {petitionCategory[petition.categoryId] || "Unknown Category"}
-                                </Typography>
-                                <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
-                                    {petitonOwnerUserImage !== "" ? (
-                                        <img
-                                            src={petitonOwnerUserImage}
-                                            height={75}
-                                            width={75}
-                                            alt={"owner-photo"}
-                                            title={"owner-photo"}
-                                            style={{
-                                                borderRadius: '50%',
-                                                objectFit: 'cover',
-                                            }}
-                                        />
-                                    ) : (
-                                        <img
-                                            src={"/defaultProfileImage.jpg"}
-                                            height={75}
-                                            width={75}
-                                            alt={"owner-photo"}
-                                            title={"owner-photo"}
-                                            style={{
-                                                borderRadius: '50%',
-                                                objectFit: 'cover',
-                                            }}
-                                        />
-                                    )}
-                                    <span style={{marginLeft: '8px'}}>
-                                        {petition.ownerFirstName} {petition.ownerLastName}
-                                    </span>
-                                </Typography>
-                            </CardContent>
-                        </Box>
-                    </CardActionArea>
-                    <CardMedia
-                        component="img"
-                        sx={{height: 230, width: 230, objectFit: "cover", borderRadius: '15%'}}
-                        src={petitionImage}
-                        alt="petition-image"
-                    />
-                </Card>
+                <Link to={"/petition/" + petitionId} style={{ textDecoration: 'none' }}>
+                    <Card sx={{ display: 'flex', maxWidth: 900, minWidth: 800, minHeight: 200,
+                        transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+                        '&:hover': {
+                            backgroundColor: grey[600],
+                            boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+                        }, }}>
+                        <CardActionArea>
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <CardContent sx={{flex: '1 0 auto'}}>
+                                    <Typography component="div" variant="h5">
+                                        {petition.title}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {petition.creationDate}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {"Minimum Support Cost: $"}{minSupportTierCost}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {petitionCategory[petition.categoryId] || "Unknown Category"}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
+                                        {petitonOwnerUserImage !== "" ? (
+                                            <img
+                                                src={petitonOwnerUserImage}
+                                                height={75}
+                                                width={75}
+                                                alt={"owner-photo"}
+                                                title={"owner-photo"}
+                                                style={{
+                                                    borderRadius: '50%',
+                                                    objectFit: 'cover',
+                                                }}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={"/defaultProfileImage.jpg"}
+                                                height={75}
+                                                width={75}
+                                                alt={"owner-photo"}
+                                                title={"owner-photo"}
+                                                style={{
+                                                    borderRadius: '50%',
+                                                    objectFit: 'cover',
+                                                }}
+                                            />
+                                        )}
+                                        <span style={{marginLeft: '8px'}}>
+                                            {petition.ownerFirstName} {petition.ownerLastName}
+                                        </span>
+                                    </Typography>
+                                </CardContent>
+                            </Box>
+                        </CardActionArea>
+                        <CardMedia
+                            component="img"
+                            sx={{height: 230, width: 230, objectFit: "cover", borderRadius: '15%'}}
+                            src={petitionImage}
+                            alt="petition-image"
+                        />
+                    </Card>
+            </Link>
             )}
         </>
     );
