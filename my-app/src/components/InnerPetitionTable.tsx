@@ -19,9 +19,10 @@ const InnerPetitionTable = ({searchInput, category}: { searchInput: String, cate
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [allPetitionsFromGetAll, setAllPetitionsFromGetAll] = useState<PetitionFromGetAll[]>([]);
     const [allPetitionsFromGetOne, setAllPetitionsFromGetOne] = useState<PetitionFromGetOne[]>([]);
+    const [allFilteredPetitions, setAllFilteredPetitions] = useState<PetitionFromGetOne[]>([])
+    const [isLoading, setIsLoading] = useState(true);
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchAllPetitions = async () => {
@@ -63,6 +64,18 @@ const InnerPetitionTable = ({searchInput, category}: { searchInput: String, cate
         fetchPetitionDetails(petitionIds);
     }, [allPetitionsFromGetAll]);
 
+    useEffect(() => {
+        const filteredPetitions = allPetitionsFromGetOne.filter((petition) => {
+            if (petition.categoryId === category) {
+                return petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    petition.description.toLowerCase().includes(searchInput.toLowerCase());
+            } else if (category === 0) {
+                return true;
+            }
+        });
+
+        setAllFilteredPetitions(filteredPetitions);
+    }, [searchInput, category, allPetitionsFromGetOne]);
 
     const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => setPage(newPage);
 
@@ -85,26 +98,10 @@ const InnerPetitionTable = ({searchInput, category}: { searchInput: String, cate
                         ) : (
                             allPetitionsFromGetOne.length > 0 ? (
                                 rowsPerPage > 0 ? (
-                                    allPetitionsFromGetOne
-                                        .filter((petition) => {
-                                            if (petition.categoryId === category) {
-                                                return petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-                                                    petition.description.toLowerCase().includes(searchInput.toLowerCase());
-                                            } else if (category === 0) {
-                                                return true;
-                                            }
-                                        })
+                                    allFilteredPetitions
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 ) : (
-                                    allPetitionsFromGetOne
-                                        .filter((petition) => {
-                                            if (petition.categoryId === category) {
-                                                return petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-                                                    petition.description.toLowerCase().includes(searchInput.toLowerCase());
-                                            } else if (category === 0) {
-                                                return true;
-                                            }
-                                        })
+                                    allFilteredPetitions
                                 )
                             ).map((currentPetition) => (
                                 <TableRow key={currentPetition.title}>
@@ -126,7 +123,7 @@ const InnerPetitionTable = ({searchInput, category}: { searchInput: String, cate
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
-                count={allPetitionsFromGetAll.length}
+                count={allFilteredPetitions.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -140,5 +137,6 @@ const InnerPetitionTable = ({searchInput, category}: { searchInput: String, cate
         </Paper>
     );
 }
+
 
 export default InnerPetitionTable;

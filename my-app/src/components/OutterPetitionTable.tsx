@@ -3,23 +3,26 @@ import Box from '@mui/material/Box';
 import InnerPetitionTable from "./InnerPetitionTable";
 import { Tab, Tabs } from "@mui/material";
 import PhoneIcon from '@mui/icons-material/Phone';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import PersonPinIcon from '@mui/icons-material/PersonPin';
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import SchoolIcon from '@mui/icons-material/School';
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 
 const OutterPetitionTable = ({ searchInput }: { searchInput: String }) => {
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        console.log(newValue);
         setValue(newValue);
     };
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Tabs value={value} onChange={handleChange} aria-label="icon label tabs example">
-                <Tab icon={<PhoneIcon />} label="RECENTS" />
-                <Tab icon={<FavoriteIcon />} label="FAVORITES" />
-                <Tab icon={<PersonPinIcon />} label="NEARBY" />
+                <Tab icon={<AllInclusiveIcon />} label="ALL" />
+                <Tab icon={<AccountBalanceIcon />} label="ECONOMICS" />
+                <Tab icon={<SchoolIcon />} label="EDUCATION" />
+                <Tab icon={<EmojiPeopleIcon />} label="DEVLEOPMENT" />
+
             </Tabs>
             <InnerPetitionTable searchInput={searchInput} category={value}/>
         </Box>
