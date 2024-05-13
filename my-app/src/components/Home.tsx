@@ -13,10 +13,9 @@ const Home = () => {
             <NavBar callbackSearchInput={setSearchInput} searchInput={searchInput} />
             <Box mt={10} >
                 <Typography variant="h4" color={grey[200]} align="center" sx={{ padding: 3 }}>
-                    Featured Petitions
+                    Find Petitions
                 </Typography>
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    {/*<InnerPetitionTable searchInput={searchInput} />*/}
                     <OutterPetitionTable searchInput={searchInput} />
                 </Box>
             </Box>
