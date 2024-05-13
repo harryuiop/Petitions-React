@@ -1,5 +1,7 @@
 declare module 'searchQuery' {
     export interface Supporter {
-        startIndex: number
+        category: string[]
+        minSupportingCost: number
+        sortBy: string
     }
 }

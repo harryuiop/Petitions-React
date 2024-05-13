@@ -8,7 +8,7 @@ import TextField from "@mui/material/TextField";
 import SearchBar from "./SearchBar";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 
-const NavBar = ( { callbackSearchInput, searchInput } : { callbackSearchInput : React.Dispatch<React.SetStateAction<string>>, searchInput: String }) => {
+const NavBar = ( { callbackSearchInput, searchInput } : { callbackSearchInput : React.Dispatch<React.SetStateAction<string>>, searchInput: string }) => {
 
     return (
         <AppBar>

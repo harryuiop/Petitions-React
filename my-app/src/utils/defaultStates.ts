@@ -35,4 +35,13 @@ export const petitionCategory: { [key: number]: string } = {
     10: "Economic Empowerment",
     11: "Science and Research",
     12: "Sports and Recreation"
-}
+};
+
+export const sortByCategorys: { [key: number]: { code: string; desc: string } } = {
+    1: { code: "ALPHABETICAL_ASC", desc: "alphabetically by title, A-Z" },
+    2: { code: "ALPHABETICAL_DESC", desc: "alphabetically by title, Z-A" },
+    3: { code: "COST_ASC", desc: "by cost of cheapest support tier ascending" },
+    4: { code: "COST_DESC", desc: "by cost of cheapest support tier descending" },
+    5: { code: "CREATED_ASC", desc: "chronologically in order of creation date oldest-newest" },
+    6: { code: "CREATED_DESC", desc: "chronologically in order of creation date newest-oldest" }
+};

@@ -27,7 +27,6 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
                     setErrorFlag(false);
                     setErrorMessage("");
                     setPetition(response.data);
-                    console.log(response.data.supportTiers)
                     findMinSupportTierCost(response.data.supportTiers);
                 }, (error) => {
                     setErrorFlag(true);
@@ -88,8 +87,6 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
         getPetitionOwnerImage();
         setIsLoading(false);
     }, [id]);
-
-    console.log(petition)
 
     return (
         <>
