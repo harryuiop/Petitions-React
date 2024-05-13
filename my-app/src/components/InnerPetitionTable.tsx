@@ -7,19 +7,18 @@ import {
     TableRow,
     TablePagination,
 } from "@mui/material";
-import React, {useEffect, useState, useMemo} from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
-import {PetitionFromGetAll, PetitionFromGetOne} from "petition";
+import { PetitionFromGetAll, PetitionFromGetOne } from "petition";
 import PetitionCard from "./PetitionCard";
 import SkeletonCard from './SkeletonCard';
 
-const InnerPetitionTable = ({ searchInput, category }: { searchInput: String, category: number } ) => {
+const InnerPetitionTable = ({searchInput, category}: { searchInput: String, category: number }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [allPetitionsFromGetAll, setAllPetitionsFromGetAll] = useState<PetitionFromGetAll[]>([]);
     const [allPetitionsFromGetOne, setAllPetitionsFromGetOne] = useState<PetitionFromGetOne[]>([]);
-    const [filteredPetitions, setFilteredPetitions] = useState<PetitionFromGetAll[]>([]);
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -65,17 +64,15 @@ const InnerPetitionTable = ({ searchInput, category }: { searchInput: String, ca
     }, [allPetitionsFromGetAll]);
 
 
-    const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
-        setPage(newPage);
-    }
+    const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => setPage(newPage);
 
     const handleChangeRowsPerPage = (event: { target: { value: string; }; }) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
-    }
+    };
 
     return (
-            <Paper sx={{minWidth: 700, maxWidth: 930}}>
+        <Paper sx={{minWidth: 700, maxWidth: 930}}>
             <TableContainer>
                 <Table aria-label="custom pagination table">
                     <TableBody>
@@ -85,25 +82,30 @@ const InnerPetitionTable = ({ searchInput, category }: { searchInput: String, ca
                                     <SkeletonCard/>
                                 </TableCell>
                             </TableRow>
-                        ) : allPetitionsFromGetOne.length > 0 ? (
-                            // ToDo: Be able to recognise descriptions
-                            (rowsPerPage > 0
-                                    ? allPetitionsFromGetOne
-                                        .filter((petition) => petition.title
-                                                .toLowerCase()
-                                                .includes(searchInput.toLowerCase()) ||
-                                                petition.description
-                                                .toLowerCase()
-                                                .includes(searchInput.toLowerCase())
-                                        )
+                        ) : (
+                            allPetitionsFromGetOne.length > 0 ? (
+                                rowsPerPage > 0 ? (
+                                    allPetitionsFromGetOne
+                                        .filter((petition) => {
+                                            if (petition.categoryId === category) {
+                                                return petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                                                    petition.description.toLowerCase().includes(searchInput.toLowerCase());
+                                            } else if (category === 0) {
+                                                return true;
+                                            }
+                                        })
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    : allPetitionsFromGetOne.filter((petition) => petition.title
-                                            .toLowerCase()
-                                            .includes(searchInput.toLowerCase()) ||
-                                            petition.description
-                                            .toLowerCase()
-                                            .includes(searchInput.toLowerCase())
-                                    )
+                                ) : (
+                                    allPetitionsFromGetOne
+                                        .filter((petition) => {
+                                            if (petition.categoryId === category) {
+                                                return petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                                                    petition.description.toLowerCase().includes(searchInput.toLowerCase());
+                                            } else if (category === 0) {
+                                                return true;
+                                            }
+                                        })
+                                )
                             ).map((currentPetition) => (
                                 <TableRow key={currentPetition.title}>
                                     <TableCell component="th" scope="row">
@@ -112,11 +114,11 @@ const InnerPetitionTable = ({ searchInput, category }: { searchInput: String, ca
                                             petitionId={currentPetition.petitionId}/>
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell>{'No petitions available'}</TableCell>
-                            </TableRow>
+                            )) : (
+                                <TableRow>
+                                    <TableCell>{'No petitions available'}</TableCell>
+                                </TableRow>
+                            )
                         )}
                     </TableBody>
                 </Table>
@@ -133,9 +135,10 @@ const InnerPetitionTable = ({ searchInput, category }: { searchInput: String, ca
                     marginTop: 2,
                     display: "flex",
                     justifyContent: "flex-start",
-                }}/>
+                }}
+            />
         </Paper>
-    )
+    );
 }
 
 export default InnerPetitionTable;

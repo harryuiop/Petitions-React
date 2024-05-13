@@ -7,7 +7,6 @@ import {PetitionFromGetOne, Supporter} from "petition";
 import { grey } from "@mui/material/colors";
 import SkeletonCard from "./SkeletonCard";
 import {defaultPetitionFromGetOne} from "../utils/defaultPetitionState";
-import {blob} from "node:stream/consumers";
 
 const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
     const [id, setId] = useState(petitionId);
