@@ -7,15 +7,20 @@ import {
     TableRow,
     TablePagination,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
-import { API_BASE_URL } from "../config";
-import { PetitionFromGetAll, PetitionFromGetOne } from "petition";
+import {API_BASE_URL} from "../config";
+import {PetitionFromGetAll, PetitionFromGetOne} from "petition";
 import PetitionCard from "./PetitionCard";
 import SkeletonCard from './SkeletonCard';
 import {petitionCategory} from "../utils/defaultStates";
 
-const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sortBy}: { searchInput: string, selectedOptions: string[], maxSupporterCost: string, sortBy: string }) => {
+const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sortBy}: {
+    searchInput: string,
+    selectedOptions: string[],
+    maxSupporterCost: string,
+    sortBy: string
+}) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [allPetitionsFromGetAll, setAllPetitionsFromGetAll] = useState<PetitionFromGetAll[]>([]);
@@ -33,7 +38,7 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
                     const response = await axios.get(API_BASE_URL + '/petitions/?sortBy=' + sortBy);
                     setAllPetitionsFromGetAll(response.data.petitions);
                 } else {
-                    const response = await axios.get(API_BASE_URL + '/petitions');
+                    const response = await axios.get(API_BASE_URL + '/petitions/?sortBy=CREATED_ASC');
                     setAllPetitionsFromGetAll(response.data.petitions);
                 }
                 setErrorFlag(false);
@@ -73,14 +78,18 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
     useEffect(() => {
         const filteredPetitions = allPetitionsFromGetOne.filter((petition) => {
             const categoryString = petitionCategory[petition.categoryId];
+            console.log(petition);
+
             if (maxSupporterCost !== "") {
-                return Math.max(...petition.supportTiers.map(obj => obj.cost)) <= parseInt(maxSupporterCost,10);
+                if (Math.min(...petition.supportTiers.map(obj => obj.cost)) > parseInt(maxSupporterCost, 10)) {
+                    return false
+                }
             }
 
             if (selectedOptions.includes(categoryString)) {
-                return (petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-                    petition.description.toLowerCase().includes(searchInput.toLowerCase()))
-            } else if (selectedOptions.length === 0){
+                return ((petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    petition.description.toLowerCase().includes(searchInput.toLowerCase())))
+            } else if (selectedOptions.length === 0) {
                 return (petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
                     petition.description.toLowerCase().includes(searchInput.toLowerCase()))
             } else if (selectedOptions.length === 0) {
@@ -151,6 +160,5 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
         </Paper>
     );
 }
-
 
 export default InnerPetitionTable;
