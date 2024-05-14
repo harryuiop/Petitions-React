@@ -12,15 +12,16 @@ import axios from "axios";
 import {API_BASE_URL} from "../config";
 import {PetitionFromGetAll, PetitionFromGetOne} from "petition";
 import PetitionCard from "./PetitionCard";
-import SkeletonCard from './SkeletonCard';
-import {petitionCategory} from "../utils/defaultStates";
+import {defaultPetitionFromGetOne, petitionCategory} from "../utils/defaultStates";
 
-const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sortBy}: {
+const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sortBy, givenPetition}: {
     searchInput: string,
     selectedOptions: string[],
     maxSupporterCost: string,
-    sortBy: string
+    sortBy: string,
+    givenPetition: PetitionFromGetOne
 }) => {
+    const [viewedPetition, setViewedPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne)
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [allPetitionsFromGetAll, setAllPetitionsFromGetAll] = useState<PetitionFromGetAll[]>([]);
@@ -79,6 +80,16 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
         const filteredPetitions = allPetitionsFromGetOne.filter((petition) => {
             const categoryString = petitionCategory[petition.categoryId];
 
+            if (givenPetition !== defaultPetitionFromGetOne) {
+                if (petition.petitionId === givenPetition.petitionId) {
+                    return false;
+                }
+            }
+
+            if (givenPetition.ownerId === petition.ownerId) {
+                return true;
+            }
+
             if (maxSupporterCost !== "") {
                 if (Math.min(...petition.supportTiers.map(obj => obj.cost)) > parseInt(maxSupporterCost, 10)) {
                     return false
@@ -97,7 +108,7 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
         });
 
         setAllFilteredPetitions(filteredPetitions);
-    }, [searchInput, selectedOptions, maxSupporterCost, allPetitionsFromGetOne]);
+    }, [searchInput, selectedOptions, maxSupporterCost, allPetitionsFromGetOne, givenPetition]);
 
     const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => setPage(newPage);
 
@@ -112,11 +123,6 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
                 <Table aria-label="custom pagination table">
                     <TableBody>
                         {isLoading ? (
-                            // <TableRow>
-                            //     <TableCell component="th" scope="row">
-                            //         <SkeletonCard/>
-                            //     </TableCell>
-                            // </TableRow>
                             <></>
                         ) : (
                             allPetitionsFromGetOne.length > 0 ? (

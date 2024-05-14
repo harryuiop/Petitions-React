@@ -1,13 +1,15 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { PetitionFromGetOne, Supporter } from "petition";
-import { defaultPetitionFromGetOne, defaultUser } from "../utils/defaultStates";
+import {useParams} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {PetitionFromGetOne, SupporterTiers} from "petition";
+import {defaultPetitionFromGetOne, defaultUser, petitionCategory} from "../utils/defaultStates";
 import axios from "axios";
-import { API_BASE_URL } from "../config";
+import {API_BASE_URL} from "../config";
 import NavBar from "./NavBar";
-import { Box, Grid, Grow, Typography } from "@mui/material";
-import { User } from "user";
+import {Grid, Grow, Typography} from "@mui/material";
+import {User} from "user";
 import PetitionSignersTable from "./PetitionSignersTable";
+import SupportTierExploreTable from "./SupportTierExploreTable";
+import InnerPetitionTable from "./InnerPetitionTable";
 
 const ExplorePetition = () => {
     const { id } = useParams();
@@ -51,7 +53,7 @@ const ExplorePetition = () => {
         fetchData();
     }, [id]);
 
-    const findMinSupportTierCost = (supportTiersInformation: Supporter[]) => {
+    const findMinSupportTierCost = (supportTiersInformation: SupporterTiers[]) => {
         const minSupportCost = Math.min(...supportTiersInformation.map(obj => obj.cost));
         setMinSupportTierCost(minSupportCost);
     }
@@ -60,7 +62,7 @@ const ExplorePetition = () => {
         <>
             <NavBar callbackSearchInput={() => { }} searchInput={""} includeSearchBar={false} />
             <Grow in={checked} style={{ transformOrigin: '0 0 0' }} {...(checked ? { timeout: 350 } : {})}>
-                <Grid container spacing={2} sx={{ paddingTop: 20, paddingLeft: 7 }}>
+                <Grid container spacing={2} sx={{ paddingTop: 20, paddingLeft: 7, paddingBottom: 4 }}>
                     <Grid item xs={4}>
                         <img
                             style={{ height: 320, width: 320, objectFit: "cover", borderRadius: '15%' }}
@@ -78,9 +80,10 @@ const ExplorePetition = () => {
                         <Typography variant={"h1"} sx={{ color: "white", fontSize: 40 }}>
                             {petition.title}
                         </Typography>
-                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem" }}>
+                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", maxWidth: 600 }}>
                             {petition.description}
                         </Typography>
+
                     </Grid>
                     <Grid item xs={4}>
                         <Typography variant={"subtitle1"} sx={{ color: "white", fontSize: 15 }}>
@@ -124,21 +127,38 @@ const ExplorePetition = () => {
                                 {petitionOwnerUserInformation.firstName} {petitionOwnerUserInformation.lastName}
                             </span>
                         </Typography>
-                        <Typography variant={"subtitle1"} sx={{ color: "white", fontSize: 20, paddingTop: 3 }}>
-                            {"Supporter Count: "}{petition.numberOfSupporters}
-                        </Typography>
-                        <Typography variant={"subtitle1"} sx={{ color: "white", fontSize: 20, paddingTop: 0 }}>
-                            {"Amount Raised: $"}{petition.moneyRaised}
-                        </Typography>
+
                     </Grid>
                     <Grid item xs={8} sx={{
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "flex-start"
+
                     }}>
                         {!isLoading && (
                             <PetitionSignersTable petitionId={petition.petitionId} />
                         )}
+                    </Grid>
+                    <Grid item xs={4} sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                    }}>
+                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", alignItems: "flex-end" }}>
+                            {"Support Tiers"}
+                        </Typography>
+                        <SupportTierExploreTable givenPetition={petition}/>
+                    </Grid>
+                    <Grid item xs={6} maxWidth={150}>
+                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", alignItems: "flex-start" }}>
+                            {"Related Petitions"}
+                        </Typography>
+                        <InnerPetitionTable
+                            searchInput={""}
+                            selectedOptions={[petitionCategory[petition.categoryId]]}
+                            maxSupporterCost={""}
+                            sortBy={""}
+                            givenPetition={petition}
+                        />
                     </Grid>
                 </Grid>
             </Grow>

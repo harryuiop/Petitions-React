@@ -27,9 +27,7 @@ const PetitionSignersTable = ({ petitionId }: { petitionId: number }) => {
         };
 
         fetchAllSupporters();
-    }, []);
-
-    console.log(allSupporters);
+    }, [petitionId]);
 
     const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => setPage(newPage);
 
@@ -67,7 +65,7 @@ const PetitionSignersTable = ({ petitionId }: { petitionId: number }) => {
                         </TableBody>
                     </Table>
                     <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[5]}
                         component="div"
                         count={allSupporters.length}
                         rowsPerPage={rowsPerPage}

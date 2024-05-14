@@ -5,7 +5,7 @@ import './globalStyles.css';
 import './App.css';
 import Home from "./components/Home";
 import SignIn from "./components/SignIn";
-import Register from "./components/register";
+import Register from "./components/Register";
 import ExplorePetition from "./components/ExplorePetition"
 
 function App() {

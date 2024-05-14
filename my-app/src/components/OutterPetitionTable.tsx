@@ -13,6 +13,7 @@ import {
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { useState } from "react";
 import { styled } from '@mui/system';
+import {defaultPetitionFromGetOne} from "../utils/defaultStates";
 
 const categoryOptions = [
     { value: "Wildlife" },
@@ -151,6 +152,7 @@ const OutterPetitionTable = ({ searchInput }: { searchInput: string }) => {
                     selectedOptions={selectedOptions}
                     maxSupporterCost={maxSupporterCost}
                     sortBy={sortBy}
+                    givenPetition={defaultPetitionFromGetOne}
                 />
             </Box>
         </Box>

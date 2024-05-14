@@ -1,5 +1,5 @@
 declare module 'petition' {
-    export interface Supporter {
+    export interface SupporterTiers {
         supportTierId: number;
         title: string;
         description: string;
@@ -9,7 +9,7 @@ declare module 'petition' {
     export interface PetitionFromGetOne {
         description: string;
         moneyRaised: number;
-        supportTiers: Supporter[];
+        supportTiers: SupporterTiers[];
         petitionId: number;
         title: string;
         categoryId: number;

@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../config";
 import axios from "axios";
 import {Link, useParams} from "react-router-dom";
 import {Box, Card, CardActionArea, CardContent, CardMedia, Grow, Skeleton, Typography} from "@mui/material";
-import {PetitionFromGetOne, Supporter} from "petition";
+import {PetitionFromGetOne, SupporterTiers} from "petition";
 import { grey } from "@mui/material/colors";
 import SkeletonCard from "./SkeletonCard";
 import {defaultPetitionFromGetOne, defaultUser, petitionCategory} from "../utils/defaultStates";
@@ -77,7 +77,7 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
             }
         }
 
-        const findMinSupportTierCost = (supportTiersInformation: Supporter[]) => {
+        const findMinSupportTierCost = (supportTiersInformation: SupporterTiers[]) => {
             const minSupportCost = Math.min(...supportTiersInformation.map(obj => obj.cost));
             setMinSupportTierCost(minSupportCost);
         }
@@ -99,7 +99,7 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
                 <Grow in={checked} style={{ transformOrigin: '0 0 0' }}
                       {...(checked ? { timeout: 1200 } : {})}>
                     <Link to={"/petition/" + petitionId} style={{ textDecoration: 'none' }}>
-                        <Card sx={{ display: 'flex', maxWidth: 900, minWidth: 800, minHeight: 200,
+                        <Card sx={{ display: 'flex', maxWidth: 900, minWidth: 600, minHeight: 200,
                             transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
                             '&:hover': {
                                 backgroundColor: grey[600],
