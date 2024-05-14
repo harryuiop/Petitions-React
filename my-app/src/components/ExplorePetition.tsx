@@ -10,6 +10,7 @@ import {User} from "user";
 import PetitionSignersTable from "./PetitionSignersTable";
 import SupportTierExploreTable from "./SupportTierExploreTable";
 import InnerPetitionTable from "./InnerPetitionTable";
+import {formatTimestamp} from "../utils/timestampFormatting";
 
 const ExplorePetition = () => {
     const { id } = useParams();
@@ -34,8 +35,7 @@ const ExplorePetition = () => {
                     axios.get(API_BASE_URL + '/users/' + id)
                 ]);
 
-
-
+                petitionInformation.data.creationDate = formatTimestamp(petitionInformation.data.creationDate)
                 setPetition(petitionInformation.data);
                 const imageUrl = URL.createObjectURL(petitionImage.data);
                 setPetitionImage(imageUrl);
@@ -97,8 +97,17 @@ const ExplorePetition = () => {
                         <Typography variant={"h1"} sx={{ color: "white", fontSize: 40 }}>
                             {petition.title}
                         </Typography>
-                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", maxWidth: 600 }}>
+                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "3rem", maxWidth: 600 }}>
                             {petition.description}
+                        </Typography>
+                        <Typography variant={"body2"} sx={{ color: "white", fontSize: 15, maxWidth: 600 }}>
+                            {"Created "}{petition.creationDate}
+                        </Typography>
+                        <Typography variant={"body2"} sx={{ color: "white", fontSize: 15, maxWidth: 600 }}>
+                            {"Money raised: $"}{petition.moneyRaised}
+                        </Typography>
+                        <Typography variant={"body2"} sx={{ color: "white", fontSize: 15, marginBottom: "1rem", maxWidth: 600 }}>
+                            {"Number of supporters: "}{petition.numberOfSupporters}
                         </Typography>
 
                     </Grid>
