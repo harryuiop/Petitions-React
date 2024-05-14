@@ -35,7 +35,7 @@ const ExplorePetition = () => {
                     axios.get(API_BASE_URL + '/users/' + id)
                 ]);
 
-                petitionInformation.data.creationDate = formatTimestamp(petitionInformation.data.creationDate)
+                petitionInformation.data.creationDate = formatTimestamp(petitionInformation.data.creationDate);
                 setPetition(petitionInformation.data);
                 const imageUrl = URL.createObjectURL(petitionImage.data);
                 setPetitionImage(imageUrl);

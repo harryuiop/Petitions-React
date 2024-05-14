@@ -118,7 +118,7 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
     };
 
     return (
-        <Paper sx={{minWidth: 700, maxWidth: 930}}>
+        <Paper sx={{minWidth: 718, maxWidth: 930}}>
             <TableContainer>
                 <Table aria-label="custom pagination table">
                     <TableBody>

@@ -5,6 +5,7 @@ import axios from "axios";
 import {API_BASE_URL} from "../config";
 import {SupporterDirectQuery} from "supporter";
 import PetitionCard from "./PetitionCard";
+import {formatTimestamp} from "../utils/timestampFormatting";
 
 const PetitionSignersTable = ({ petitionId }: { petitionId: number }) => {
     const [allSupporters, setAllSupporters] = useState<SupporterDirectQuery[]>([]);
@@ -19,6 +20,9 @@ const PetitionSignersTable = ({ petitionId }: { petitionId: number }) => {
                 .then((response) => {
                     setErrorFlag(false);
                     setErrorMessage("");
+                    response.data.map((supporter: SupporterDirectQuery) => {
+                        supporter.timestamp = formatTimestamp(supporter.timestamp);
+                    })
                     setAllSupporters(response.data);
                 }, (error) => {
                     setErrorFlag(true);
@@ -38,7 +42,7 @@ const PetitionSignersTable = ({ petitionId }: { petitionId: number }) => {
 
     return(
         <>
-            <Paper sx={{minWidth: 700, maxWidth: 930}}>
+            <Paper sx={{minWidth: 718, maxWidth: 930}}>
                 <TableContainer>
                     <Table sx={{ minWidth: 350 }} aria-label="custom pagination table">
                         <TableHead>
