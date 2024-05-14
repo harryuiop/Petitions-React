@@ -8,6 +8,7 @@ import { grey } from "@mui/material/colors";
 import SkeletonCard from "./SkeletonCard";
 import {defaultPetitionFromGetOne, defaultUser, petitionCategory} from "../utils/defaultStates";
 import {User} from "user";
+import {formatTimestamp} from "../utils/timestampFormatting";
 
 const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
     const [id, setId] = useState(petitionId);
@@ -27,6 +28,7 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
                 .then((response) => {
                     setErrorFlag(false);
                     setErrorMessage("");
+                    response.data.creationDate = formatTimestamp(response.data.creationDate)
                     setPetition(response.data);
                     findMinSupportTierCost(response.data.supportTiers);
                 }, (error) => {
@@ -112,7 +114,7 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
                                             {petition.title}
                                         </Typography>
                                         <Typography variant="body2">
-                                            {petition.creationDate}
+                                            {"Created "}{petition.creationDate}
                                         </Typography>
                                         <Typography variant="body2">
                                             {"Minimum Support Cost: $"}{minSupportTierCost}
