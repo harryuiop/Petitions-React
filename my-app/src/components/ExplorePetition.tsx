@@ -5,7 +5,7 @@ import {defaultPetitionFromGetOne, defaultUser, petitionCategory} from "../utils
 import axios from "axios";
 import {API_BASE_URL} from "../config";
 import NavBar from "./NavBar";
-import {Grid, Grow, Typography} from "@mui/material";
+import {Box, Grid, Grow, Typography} from "@mui/material";
 import {User} from "user";
 import PetitionSignersTable from "./PetitionSignersTable";
 import SupportTierExploreTable from "./SupportTierExploreTable";
@@ -26,22 +26,21 @@ const ExplorePetition = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [petitionResponse
-                      ,imageResponse
-                      ,ownerResponse
-                      ,ownerImageResponse] = await Promise.all([
+                const [petitionInformation
+                      ,petitionImage
+                      ,petitionOwnerInformation] = await Promise.all([
                     axios.get(API_BASE_URL + '/petitions/' + id),
                     axios.get(API_BASE_URL + '/petitions/' + id + '/image', { responseType: 'blob' }),
-                    axios.get(API_BASE_URL + '/users/' + id),
-                    axios.get(API_BASE_URL + '/users/' + id + '/image', { responseType: 'blob' })
+                    axios.get(API_BASE_URL + '/users/' + id)
                 ]);
-                setPetition(petitionResponse.data);
-                const imageUrl = URL.createObjectURL(imageResponse.data);
+
+
+
+                setPetition(petitionInformation.data);
+                const imageUrl = URL.createObjectURL(petitionImage.data);
                 setPetitionImage(imageUrl);
-                setPetitionOwnerUserInformation(ownerResponse.data);
-                const ownerImageUrl = URL.createObjectURL(ownerImageResponse.data);
-                setPetitionOwnerUserImage(ownerImageUrl);
-                findMinSupportTierCost(petitionResponse.data.supportTiers);
+                setPetitionOwnerUserInformation(petitionOwnerInformation.data)
+                findMinSupportTierCost(petitionInformation.data.supportTiers);
                 setIsLoading(false);
                 setChecked(true);
             } catch (error: any) {
@@ -50,8 +49,26 @@ const ExplorePetition = () => {
             }
         };
 
+        const fetchPetitionOwnerImage = async () => {
+            try {
+                const response = await axios.get(API_BASE_URL + '/users/' + id + '/image', {
+                    responseType: 'blob'
+                });
+                setErrorFlag(false);
+                setErrorMessage("");
+                const url = URL.createObjectURL(response.data);
+                setPetitionOwnerUserImage(url);
+            } catch (error: any) {
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
+            }
+        }
+
         fetchData();
+        fetchPetitionOwnerImage();
     }, [id]);
+
+    console.log(petitionOwnerUserInformation.firstName);
 
     const findMinSupportTierCost = (supportTiersInformation: SupporterTiers[]) => {
         const minSupportCost = Math.min(...supportTiersInformation.map(obj => obj.cost));
@@ -115,8 +132,8 @@ const ExplorePetition = () => {
                                     src={"/defaultProfileImage.jpg"}
                                     height={75}
                                     width={75}
-                                    alt={"owner-photo"}
-                                    title={"owner-photo"}
+                                    alt={"owner-default-photo"}
+                                    title={"owner-default-photo"}
                                     style={{
                                         borderRadius: '50%',
                                         objectFit: 'cover',
@@ -142,24 +159,28 @@ const ExplorePetition = () => {
                     <Grid item xs={4} sx={{
                         display: "flex",
                         flexDirection: "column",
+                        alignItems: "center"
                     }}>
-                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", alignItems: "flex-end" }}>
+                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", alignItems: "center" }}>
                             {"Support Tiers"}
                         </Typography>
                         <SupportTierExploreTable givenPetition={petition}/>
                     </Grid>
-                    <Grid item xs={6} maxWidth={150}>
-                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", alignItems: "flex-start" }}>
+                    <Grid item xs={6} sx={{ maxWidth: 10, textAlign: 'left' }}>
+                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", alignItems: "center", paddingLeft: 33}}>
                             {"Related Petitions"}
                         </Typography>
-                        <InnerPetitionTable
-                            searchInput={""}
-                            selectedOptions={[petitionCategory[petition.categoryId]]}
-                            maxSupporterCost={""}
-                            sortBy={""}
-                            givenPetition={petition}
-                        />
+                        <Box maxWidth={10}>
+                            <InnerPetitionTable
+                                searchInput={""}
+                                selectedOptions={[petitionCategory[petition.categoryId]]}
+                                maxSupporterCost={""}
+                                sortBy={""}
+                                givenPetition={petition}
+                            />
+                        </Box>
                     </Grid>
+
                 </Grid>
             </Grow>
         </>
