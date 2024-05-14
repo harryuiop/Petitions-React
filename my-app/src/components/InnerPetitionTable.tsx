@@ -113,11 +113,12 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
                 <Table aria-label="custom pagination table">
                     <TableBody>
                         {isLoading ? (
-                            <TableRow>
-                                <TableCell component="th" scope="row">
-                                    <SkeletonCard/>
-                                </TableCell>
-                            </TableRow>
+                            // <TableRow>
+                            //     <TableCell component="th" scope="row">
+                            //         <SkeletonCard/>
+                            //     </TableCell>
+                            // </TableRow>
+                            <></>
                         ) : (
                             allPetitionsFromGetOne.length > 0 ? (
                                 rowsPerPage > 0 ? (
