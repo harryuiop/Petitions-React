@@ -1,5 +1,6 @@
 import {PetitionFromGetOne} from "petition";
 import {User} from "user";
+import {SupporterDirectQuery} from "supporter";
 
 export const defaultPetitionFromGetOne: PetitionFromGetOne = {
     description: '',
@@ -21,6 +22,16 @@ export const defaultUser: User = {
     lastName: "",
     email: ""
 };
+
+export const defaultSupporterFromQuery: SupporterDirectQuery = {
+    "supportId": -1,
+    "supportTierId": -1,
+    "message": "",
+    "supporterId": -1,
+    "supporterFirstName": "",
+    "supporterLastName": "",
+    "timestamp": ""
+}
 
 export const petitionCategory: { [key: number]: string } = {
     1:  "Wildlife",

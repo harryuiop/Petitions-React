@@ -78,7 +78,6 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
     useEffect(() => {
         const filteredPetitions = allPetitionsFromGetOne.filter((petition) => {
             const categoryString = petitionCategory[petition.categoryId];
-            console.log(petition);
 
             if (maxSupporterCost !== "") {
                 if (Math.min(...petition.supportTiers.map(obj => obj.cost)) > parseInt(maxSupporterCost, 10)) {
