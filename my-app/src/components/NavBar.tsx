@@ -7,8 +7,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
 import SearchBar from "./SearchBar";
 import HandshakeIcon from "@mui/icons-material/Handshake";
+import {UserAuth} from "user";
+import {useUserAuthDetailsContext} from "../utils/userAuthContext";
 
 const NavBar = ( { callbackSearchInput, searchInput, includeSearchBar } : { callbackSearchInput : React.Dispatch<React.SetStateAction<string>>, searchInput: string, includeSearchBar: boolean }) => {
+    const userAuth = useUserAuthDetailsContext();
 
     return (
         <AppBar>
@@ -23,8 +26,8 @@ const NavBar = ( { callbackSearchInput, searchInput, includeSearchBar } : { call
                 </Stack>
                 {includeSearchBar ? <SearchBar callbackSearchInput={callbackSearchInput} searchInput={searchInput}/> : <></>}
                 <Stack direction="row" spacing={2}>
-                    <Button component={Link} to="/signin"> Sign in </Button>
-                    <Button component={Link} to="/register"> Profile </Button>
+                    {userAuth.authUser.loggedIn ? <> <Button component={Link} to="/"> Profile </Button> <Button onClick={() => userAuth.handleLogout()}> Log Out </Button></>
+                        : <Button component={Link} to="/signin"> Sign in </Button>}
                 </Stack>
             </Toolbar>
         </AppBar>

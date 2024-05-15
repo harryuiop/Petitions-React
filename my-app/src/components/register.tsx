@@ -1,13 +1,16 @@
-import {Box, Button, TextField, Typography} from "@mui/material";
+import {Alert, Box, Button, Snackbar, TextField, Typography} from "@mui/material";
 import {green, grey} from "@mui/material/colors";
-import {Link} from "react-router-dom";
-import classes from "*.module.css";
-import {useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import React, {useState} from "react";
 import {API_BASE_URL} from "../config";
 import axios from "axios";
 import {useUserAuthDetailsContext} from "../utils/userAuthContext";
 
 const Register = () => {
+    const navigate = useNavigate();
+    const [snackbarSuccessOpen, setSnackbarSuccessOpen] = useState(false);
+    const [snackbarFailOpen, setSnackbarFailOpen] = useState(false);
+
     const [inputtedProfilePhoto, setInputtedProfilePhoto] = useState("");
     const [inputtedEmail, setInputtedEmail] = useState("");
     const [inputtedPassword, setInputtedPassword] = useState("");
@@ -23,53 +26,103 @@ const Register = () => {
 
     const userAuth = useUserAuthDetailsContext();
 
+    if (userAuth.loggedIn) {
+        navigate("/");
+    }
+
     const handleImageChange = (event: any) => {
         const file = event.target.files[0];
         if (file) {
             setInputtedProfilePhoto(file);
+            setPhotoInputted(true)
         }
     };
 
+    const validateEmailInput = () => {
+        // Note I did not come out with this expression
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regex.test(inputtedEmail) && inputtedEmail.length !== 0) {
+            setEmailError(true);
+        } else {
+            setEmailError(false);
+        }
+    }
+
+    const validatePasswordInput = () => {
+        if (inputtedPassword.length > 0 && inputtedPassword.length < 6) {
+            setPasswordError(true);
+        } else {
+            setPasswordError(false);
+        }
+    }
+
     const handleSubmit = async () => {
         try {
-             const response = await axios.post(API_BASE_URL + '/users/register', {
+            const response = await axios.post(API_BASE_URL + '/users/register', {
                 firstName: inputtedFirstName,
                 lastName: inputtedLastName,
                 email: inputtedEmail,
                 password: inputtedPassword
-            }, { responseType: 'json' });
+            }, {responseType: 'json'});
 
             console.log(response.data);
             setInputtedLastName("");
             setInputtedFirstName("");
             setInputtedEmail("");
             setInputtedPassword("");
+            setSnackbarSuccessOpen(true);
+            localStorage.setItem("isLoggedIn", "true")
+            navigate("/SignIn");
 
         } catch (error: any) {
-            if (error.message.includes('400 Bad Request')) {
+            console.log(error.response.status);
+            if (error.response.status === 400) {
                 setErrorMessage('Invalid information');
-            } else if (error.message.includes('403 Forbidden')) {
+                setSnackbarFailOpen(true);
+            } else if (error.response.status === 403) {
                 setErrorMessage('Email already in use');
-                setEmailError(true); // Set email error to true to highlight the field
+                setEmailError(true);
+                setSnackbarFailOpen(true);
             } else {
                 setErrorMessage('Internal Server Error');
+                setSnackbarFailOpen(true);
             }
+            setInputtedLastName("");
+            setInputtedFirstName("");
+            setInputtedEmail("");
+            setInputtedPassword("");
         }
+    };
+
+    const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbarSuccessOpen(false);
+        setSnackbarFailOpen(false);
     };
 
     return (
         <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh"}}>
             <Box sx={{display: "flex", flexDirection: "column", maxWidth: 500, padding: 3, minWidth: 100}}>
-                <Typography variant="h3" color={grey[200]} sx={{paddingTop: 3, paddingBottom: 4}}>
+                <Typography variant="h3" color={grey[200]} sx={{paddingTop: 3, paddingBottom: 4, marginRight: 2}}>
                     Register
                 </Typography>
-                <TextField id="email" label="Email" variant="outlined" value={inputtedEmail} onChange={(event) => {
+                <TextField id="email" label="Email" variant="outlined" onBlur={() => {
+                    validateEmailInput()
+                }} value={inputtedEmail} onChange={(event) => {
                     setInputtedEmail(event.target.value)
-                }} sx={{marginBottom: 2}}/>
-                <TextField id="password" label="Password" variant="outlined" value={inputtedPassword}
+                }} sx={{marginBottom: 2}}
+                           error={emailError}
+                           helperText={emailError ? 'Must contain an @ and a top-level domain' : ''}/>
+                <TextField id="password" label="Password" variant="outlined" value={inputtedPassword} onBlur={() => {
+                    validatePasswordInput()
+                }}
+                           error={passwordError}
                            onChange={(event) => {
                                setInputtedPassword(event.target.value)
-                           }} sx={{marginBottom: 2}}/>
+                           }} sx={{marginBottom: 2}}
+                           helperText={passwordError ? 'Must be at least 6 characters long' : ''}/>
                 <TextField id="firstname" label="First name" variant="outlined" value={inputtedFirstName}
                            onChange={(event) => {
                                setInputtedFirstName(event.target.value)
@@ -86,13 +139,15 @@ const Register = () => {
                     type="file"
                     onChange={handleImageChange}
                 />
+
+                {/* ToDo: Finish the photo implementation */}
                 <label htmlFor="raised-button-file">
-                    <Button component="span" className="imageInput">
-                        Upload profile image
+                    <Button component="span" className="imageInput" sx={{marginBottom: 2}}>
+                        {!photoInputted ? "Upload profile image" : "Change uploaded image"}
                     </Button>
                 </label>
                 {photoInputted && (
-                    <Typography variant="body2" sx={{color: green[400], marginTop: 1, paddingBottom: 2}}>
+                    <Typography variant="body2" sx={{color: green[400], marginTop: 0, paddingBottom: 2}}>
                         Image uploaded successfully!
                     </Typography>
                 )}
@@ -118,6 +173,26 @@ const Register = () => {
                     type="file"
                 />
             </Box>
+            <Snackbar
+                open={snackbarSuccessOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+            >
+                <Alert onClose={handleSnackbarClose} severity="success" sx={{width: '100%'}}>
+                    {"Account Created"}
+                </Alert>
+            </Snackbar>
+            <Snackbar
+                open={snackbarFailOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+            >
+                <Alert onClose={handleSnackbarClose} severity="error" sx={{width: '100%'}}>
+                    {errorMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     )
 }

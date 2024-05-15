@@ -9,5 +9,6 @@ declare module 'user' {
     export interface UserAuth {
         userId: number
         token: string
+        loggedIn: boolean
     }
 }

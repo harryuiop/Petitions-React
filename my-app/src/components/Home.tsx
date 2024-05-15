@@ -1,12 +1,31 @@
 import NavBar from "./NavBar";
 import InnerPetitionTable from "./InnerPetitionTable";
-import { Box, Typography } from "@mui/material";
+import {Alert, Box, Snackbar, Typography} from "@mui/material";
 import { grey } from "@mui/material/colors";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import OutterPetitionTable from "./OutterPetitionTable";
+import {useUserAuthDetailsContext} from "../utils/userAuthContext";
 
 const Home = () => {
+    const userAuth = useUserAuthDetailsContext();
     const [searchInput, setSearchInput] = useState("");
+    const [loginSnackbarOpen, setLoginSnackbarOpen] = useState(false);
+
+    useEffect(() => {
+
+        const isLoggedIn = localStorage.getItem("isLoggedIn");
+        if (isLoggedIn === "true") {
+            setLoginSnackbarOpen(true);
+            localStorage.removeItem("isLoggedIn");
+        }
+    }, []);
+
+    const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setLoginSnackbarOpen(false);
+    };
 
     return (
         <div>
@@ -19,6 +38,17 @@ const Home = () => {
                     <OutterPetitionTable searchInput={searchInput} />
                 </Box>
             </Box>
+
+            <Snackbar
+                open={loginSnackbarOpen}
+                autoHideDuration={4000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%', marginRight: 2, marginTop: 10 }}>
+                    {"Successfully logged in"}
+                </Alert>
+            </Snackbar>
         </div>
     )
 };
