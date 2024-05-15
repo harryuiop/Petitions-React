@@ -5,6 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {createTheme, ThemeProvider} from "@mui/material";
 import {dark} from "@mui/material/styles/createPalette";
+import {userAuthDetailsContext} from "./utils/userAuthContext";
+
 
 const theme = createTheme({
     palette: {
@@ -18,9 +20,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-      <ThemeProvider theme={theme}>
-        <App />
-      </ThemeProvider>
+          <ThemeProvider theme={theme}>
+              <App />
+          </ThemeProvider>
   </React.StrictMode>
 );
 

@@ -5,4 +5,9 @@ declare module 'user' {
         lastName: string
         email: string
     }
+
+    export interface UserAuth {
+        userId: number
+        token: string
+    }
 }
