@@ -6,7 +6,17 @@ import { useUserAuthDetailsContext } from "../utils/userAuthContext";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
 import NavBar from "./NavBar";
-import { Alert, Box, Button, Grow, Snackbar, TextField, Typography } from "@mui/material";
+import {
+    Alert,
+    Box,
+    Button,
+    Chip,
+    Divider,
+    Grow,
+    Snackbar,
+    TextField,
+    Typography,
+} from "@mui/material";
 import { green, grey } from "@mui/material/colors";
 
 const EditProfile = () => {
@@ -23,6 +33,7 @@ const EditProfile = () => {
     const [snackbarFailOpen, setSnackbarFailOpen] = useState(false);
 
     const [inputtedProfilePhoto, setInputtedProfilePhoto] = useState("");
+    const [fileType, setFileType] = useState("");
     const [inputtedEmail, setInputtedEmail] = useState("");
     const [inputtedCurrentPassword, setInputtedCurrentPassword] = useState("");
     const [inputtedPassword, setInputtedPassword] = useState("");
@@ -32,11 +43,13 @@ const EditProfile = () => {
     const [photoInputted, setPhotoInputted] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
-    const [firstNameError, setFirstNameError] = useState(false);
-    const [lastNameError, setLastNameError] = useState(false);
     const [passwordVisibility, setPasswordVisibility] = useState(true);
+    const [imageToRemove, setImageToRemove] = useState(false);
 
-    if (userAuth.authUser.userId === -1) {
+    if (
+        userAuth.authUser.userId === -1 ||
+        userAuth.authUser.userId !== parseInt(id as string, 10)
+    ) {
         navigate("/");
     }
 
@@ -63,6 +76,8 @@ const EditProfile = () => {
                 );
         };
 
+        // blob:http://localhost:3000/ac001828-f570-4706-9021-3ea3b2c239a5
+
         const fetchUserProfileImage = async () => {
             try {
                 const response = await axios.get(API_BASE_URL + "/users/" + id + "/image", {
@@ -75,6 +90,8 @@ const EditProfile = () => {
                 setErrorMessage("");
                 const url = URL.createObjectURL(response.data);
                 setUserProfilePhoto(url);
+                setPhotoInputted(true);
+                console.log(url);
             } catch (error: any) {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());
@@ -83,7 +100,6 @@ const EditProfile = () => {
 
         fetchUserInformation();
         fetchUserProfileImage();
-        // console.log(userInformation);
         setChecked(true);
     }, []);
 
@@ -93,13 +109,38 @@ const EditProfile = () => {
                 // do something
             }
 
-            const response = await axios.patch(API_BASE_URL + "/users/" + id, {
-                firstName: inputtedFirstName,
-                lastName: inputtedLastName,
-                email: inputtedEmail,
-                password: inputtedPassword,
-                currentPassword: inputtedCurrentPassword,
+            if (imageToRemove) {
+                setImageToRemove(false);
+                await removeImageFromServer();
+            }
+
+            // Found from https://stackoverflow.com/questions/11704267/in-javascript-how-to-conditionally-add-a-member-to-an-object
+            const requestBody = {
+                ...(inputtedFirstName !== "" && { firstName: inputtedFirstName }),
+                ...(inputtedLastName !== "" && { lastName: inputtedLastName }),
+                ...(inputtedEmail !== "" && { email: inputtedEmail }),
+                ...(inputtedPassword !== "" && { password: inputtedPassword }),
+                ...(inputtedCurrentPassword !== "" && { currentPassword: inputtedCurrentPassword }),
+            };
+
+            await axios.patch(API_BASE_URL + "/users/" + id, requestBody, {
+                headers: {
+                    "X-Authorization": userAuth.authUser.token,
+                },
             });
+
+            if (inputtedProfilePhoto !== "") {
+                await axios.put(
+                    API_BASE_URL + "/users/" + id + "/image",
+                    { inputtedProfilePhoto },
+                    {
+                        headers: {
+                            "X-Authorization": userAuth.authUser.token,
+                            "Content-Type": fileType,
+                        },
+                    },
+                );
+            }
 
             setInputtedLastName("");
             setInputtedFirstName("");
@@ -108,17 +149,17 @@ const EditProfile = () => {
             setInputtedPassword("");
             setSnackbarSuccessOpen(true);
             localStorage.setItem("isLoggedIn", "true");
-            navigate("/profile/" + id);
+            navigate("/user/profile/" + id);
         } catch (error: any) {
             if (error.response.status === 400) {
                 setErrorMessage("Invalid information");
                 setSnackbarFailOpen(true);
             } else if (error.response.status === 401) {
-                setErrorMessage(error.response.message);
+                setErrorMessage("Unauthorized or Invalid current password");
                 setEmailError(true);
                 setSnackbarFailOpen(true);
             } else if (error.response.status === 403) {
-                setErrorMessage(error.response.message);
+                setErrorMessage("Invalid information");
                 setEmailError(true);
                 setSnackbarFailOpen(true);
             } else {
@@ -134,14 +175,17 @@ const EditProfile = () => {
 
     const handleImageChange = (event: any) => {
         const file = event.target.files[0];
+        setFileType(file.type);
         if (file) {
             setInputtedProfilePhoto(file);
             setPhotoInputted(true);
+            const imageUrl = URL.createObjectURL(file);
+            setUserProfilePhoto(imageUrl);
         }
     };
 
     const validateEmailInput = () => {
-        // Note: I did not come out with this expression
+        // Note: I did not come out with this expression as it was found online
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!regex.test(inputtedEmail) && inputtedEmail.length !== 0) {
             setEmailError(true);
@@ -151,15 +195,41 @@ const EditProfile = () => {
     };
 
     const validatePasswordInput = () => {
-        if (inputtedPassword.length > 0 && inputtedPassword.length < 6) {
+        if (inputtedPassword.length > 0 && inputtedPassword !== inputtedCurrentPassword) {
             setPasswordError(true);
         } else {
             setPasswordError(false);
         }
     };
 
-    const handlePasswordVisibility = () => {
-        setPasswordVisibility(!passwordVisibility);
+    const removeImageFromServer = async () => {
+        try {
+            await axios.delete(API_BASE_URL + "/users/" + id + "/image", {
+                headers: {
+                    "X-Authorization": userAuth.authUser.token,
+                },
+            });
+        } catch (error: any) {
+            setInputtedProfilePhoto("");
+            setPhotoInputted(false);
+            if (error.response.status === 401) {
+                setErrorMessage("Unauthorized");
+                setSnackbarFailOpen(true);
+            } else if (error.response.status === 403) {
+                setErrorMessage("Can not delete another user's profile photo");
+            } else if (error.response.status === 404) {
+                setErrorMessage("User Not found");
+            } else {
+                setErrorMessage(error.response.message);
+                setSnackbarFailOpen(true);
+            }
+        }
+    };
+
+    const handleRemoveImage = async () => {
+        setImageToRemove(true);
+        setPhotoInputted(false);
+        setInputtedProfilePhoto("");
     };
 
     const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -193,7 +263,7 @@ const EditProfile = () => {
                                 flexDirection: "column",
                                 maxWidth: 500,
                                 padding: 3,
-                                minWidth: 100,
+                                minWidth: 330,
                             }}
                         >
                             <Typography
@@ -207,7 +277,7 @@ const EditProfile = () => {
                             >
                                 Edit Profile
                             </Typography>
-                            {userProfilePhoto !== "" ? (
+                            {photoInputted ? (
                                 <img
                                     src={userProfilePhoto}
                                     height={275}
@@ -244,9 +314,32 @@ const EditProfile = () => {
                                     minWidth: 100,
                                 }}
                             >
+                                <Divider sx={{ marginBottom: 2 }}>
+                                    <Chip label="Change User Details" size="small" />
+                                </Divider>
+                                <TextField
+                                    id="firstname"
+                                    label="New First Name"
+                                    variant="outlined"
+                                    value={inputtedFirstName}
+                                    onChange={(event) => {
+                                        setInputtedFirstName(event.target.value);
+                                    }}
+                                    sx={{ marginBottom: 2 }}
+                                />
+                                <TextField
+                                    id="lastname"
+                                    label="New Last name"
+                                    variant="outlined"
+                                    value={inputtedLastName}
+                                    onChange={(event) => {
+                                        setInputtedLastName(event.target.value);
+                                    }}
+                                    sx={{ marginBottom: 2 }}
+                                />
                                 <TextField
                                     id="email"
-                                    label="Email"
+                                    label="New Email"
                                     variant="outlined"
                                     onBlur={() => {
                                         validateEmailInput();
@@ -261,10 +354,13 @@ const EditProfile = () => {
                                         emailError ? "Must contain an @ and a top-level domain" : ""
                                     }
                                 />
+                                <Divider sx={{ marginBottom: 2 }}>
+                                    <Chip label="Change Password" size="small" />
+                                </Divider>
                                 <TextField
                                     id="password"
-                                    label="Password"
-                                    type={passwordVisibility ? "password" : ""}
+                                    label="Current Password"
+                                    type={"password"}
                                     variant="outlined"
                                     value={inputtedPassword}
                                     onBlur={() => {
@@ -281,42 +377,22 @@ const EditProfile = () => {
                                 />
 
                                 <TextField
-                                    id="password"
-                                    label="Password"
+                                    id="confirm-password"
+                                    label="New Password"
                                     variant="outlined"
-                                    value={inputtedPassword}
+                                    type={"password"}
+                                    value={inputtedCurrentPassword}
                                     onBlur={() => {
                                         validatePasswordInput();
                                     }}
                                     error={passwordError}
                                     onChange={(event) => {
-                                        setInputtedPassword(event.target.value);
+                                        setInputtedCurrentPassword(event.target.value);
                                     }}
                                     sx={{ marginBottom: 2 }}
                                     helperText={
                                         passwordError ? "Must be at least 6 characters long" : ""
                                     }
-                                />
-
-                                <TextField
-                                    id="firstname"
-                                    label="First name"
-                                    variant="outlined"
-                                    value={inputtedFirstName}
-                                    onChange={(event) => {
-                                        setInputtedFirstName(event.target.value);
-                                    }}
-                                    sx={{ marginBottom: 2 }}
-                                />
-                                <TextField
-                                    id="lastname"
-                                    label="Last name"
-                                    variant="outlined"
-                                    value={inputtedLastName}
-                                    onChange={(event) => {
-                                        setInputtedLastName(event.target.value);
-                                    }}
-                                    sx={{ marginBottom: 2 }}
                                 />
                                 <input
                                     accept="image/*"
@@ -328,6 +404,13 @@ const EditProfile = () => {
                                 />
 
                                 {/* ToDo: Finish the photo implementation */}
+                                <Button
+                                    component="span"
+                                    sx={{ marginBottom: 1 }}
+                                    onClick={handleRemoveImage}
+                                >
+                                    Remove your profile image
+                                </Button>
                                 <label htmlFor="raised-button-file">
                                     <Button
                                         component="span"

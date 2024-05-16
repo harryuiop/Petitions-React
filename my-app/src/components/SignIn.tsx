@@ -1,14 +1,12 @@
-import { Box, Button, InputAdornment, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, InputAdornment, Snackbar, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { grey } from "@mui/material/colors";
 import { AccountCircle } from "@mui/icons-material";
 import LockIcon from "@mui/icons-material/Lock";
-import { Snackbar, Alert } from "@mui/material";
 import { useUserAuthDetailsContext } from "../utils/userAuthContext";
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL } from "../config";
 import axios from "axios";
-import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -95,7 +93,6 @@ const SignIn = () => {
                 loggedIn: true,
             });
             localStorage.setItem("isLoggedIn", "true");
-            console.log(response.data.token);
             navigate("/");
         }
     };

@@ -18,8 +18,6 @@ const Home = () => {
         }
     }, []);
 
-    console.log(userAuth.authUser);
-
     const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
             return;

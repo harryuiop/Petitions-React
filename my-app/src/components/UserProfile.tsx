@@ -19,7 +19,10 @@ const UserProfile = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [checked, setChecked] = useState(false);
 
-    if (userAuth.authUser.userId === -1) {
+    if (
+        userAuth.authUser.userId === -1 ||
+        userAuth.authUser.userId !== parseInt(id as string, 10)
+    ) {
         navigate("/");
     }
 
@@ -48,7 +51,7 @@ const UserProfile = () => {
 
         const fetchUserProfileImage = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/users/${id}/image`, {
+                const response = await axios.get(API_BASE_URL + "/users/" + id + "/image", {
                     headers: {
                         "X-Authorization": userAuth.authUser.token,
                     },
@@ -69,8 +72,6 @@ const UserProfile = () => {
         // console.log(userInformation);
         setChecked(true);
     }, []);
-
-    console.log(userInformation);
 
     return (
         <>
