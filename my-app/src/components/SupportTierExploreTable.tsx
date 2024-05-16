@@ -1,9 +1,17 @@
-import {Table, TableBody, TableCell, TableContainer, Card, TableRow, Typography} from "@mui/material";
-import React, {useEffect, useState} from "react";
-import {PetitionFromGetOne, SupporterTiers} from "petition";
-import {grey} from "@mui/material/colors";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    Card,
+    TableRow,
+    Typography,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { PetitionFromGetOne, SupporterTiers } from "petition";
+import { grey } from "@mui/material/colors";
 
-const SupportTierExploreTable = ({ givenPetition }: {givenPetition: PetitionFromGetOne}) => {
+const SupportTierExploreTable = ({ givenPetition }: { givenPetition: PetitionFromGetOne }) => {
     const [allSupportTiers, setAllSupportTiers] = useState<SupporterTiers[]>([]);
 
     useEffect(() => {
@@ -13,7 +21,10 @@ const SupportTierExploreTable = ({ givenPetition }: {givenPetition: PetitionFrom
     return (
         <>
             <TableContainer sx={{ maxWidth: 430 }}>
-                <Table sx={{ minWidth: 350, maxWidth: 530, border: "none" }} aria-label="simple table">
+                <Table
+                    sx={{ minWidth: 350, maxWidth: 530, border: "none" }}
+                    aria-label="simple table"
+                >
                     <TableBody>
                         {allSupportTiers.map((supportTier) => (
                             <TableRow key={supportTier.supportTierId}>
@@ -26,34 +37,45 @@ const SupportTierExploreTable = ({ givenPetition }: {givenPetition: PetitionFrom
                                         backgroundColor: "transparent",
                                         fontWeight: "normal",
                                         paddingBottom: 2,
-                                        maxWidth: 5
+                                        maxWidth: 5,
                                     }}
                                 >
                                     <Card sx={{ borderRadius: 5 }}>
-                                        <Typography variant="h6" component="div" sx={{
-                                            backgroundColor: grey[600],
-                                            paddingLeft: 2,
-                                            paddingRight: 2,
-                                            paddingTop: 1.5,
-                                            paddingBottom: 1,
-                                            fontWeight: "bold",
-                                            textAlign: "center"
-                                        }}>
+                                        <Typography
+                                            variant="h6"
+                                            component="div"
+                                            sx={{
+                                                backgroundColor: grey[600],
+                                                paddingLeft: 2,
+                                                paddingRight: 2,
+                                                paddingTop: 1.5,
+                                                paddingBottom: 1,
+                                                fontWeight: "bold",
+                                                textAlign: "center",
+                                            }}
+                                        >
                                             {supportTier.title}
                                         </Typography>
-                                        <Typography color="text.secondary" sx={{
-                                            mb: 1.5,
-                                            paddingLeft: 2,
-                                            paddingRight: 2,
-                                            paddingTop: 2
-                                        }}>
-                                            {"Support for: $"}{supportTier.cost}
+                                        <Typography
+                                            color="text.secondary"
+                                            sx={{
+                                                mb: 1.5,
+                                                paddingLeft: 2,
+                                                paddingRight: 2,
+                                                paddingTop: 2,
+                                            }}
+                                        >
+                                            {"Support for: $"}
+                                            {supportTier.cost}
                                         </Typography>
-                                        <Typography variant="body2" sx={{
-                                            paddingLeft: 2,
-                                            paddingRight: 2,
-                                            paddingBottom: 2
-                                        }}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                paddingLeft: 2,
+                                                paddingRight: 2,
+                                                paddingBottom: 2,
+                                            }}
+                                        >
                                             {supportTier.description}
                                         </Typography>
                                     </Card>
@@ -64,7 +86,7 @@ const SupportTierExploreTable = ({ givenPetition }: {givenPetition: PetitionFrom
                 </Table>
             </TableContainer>
         </>
-    )
-}
+    );
+};
 
-export default SupportTierExploreTable
+export default SupportTierExploreTable;

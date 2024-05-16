@@ -1,7 +1,5 @@
 const RelatedPetitionsTable = () => {
-    return(
-        <></>
-    )
-}
+    return <></>;
+};
 
-export default RelatedPetitionsTable
+export default RelatedPetitionsTable;

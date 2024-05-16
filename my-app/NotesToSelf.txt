@@ -1,0 +1,4 @@
+Things to Fix:
+1. Images in register to be complete
+2. No sign out snackbar
+3. Refresh on profile send us back to "/"

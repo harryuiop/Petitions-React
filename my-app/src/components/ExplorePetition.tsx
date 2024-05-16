@@ -1,23 +1,24 @@
-import {useParams} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import {PetitionFromGetOne, SupporterTiers} from "petition";
-import {defaultPetitionFromGetOne, defaultUser, petitionCategory} from "../utils/defaultStates";
+import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { PetitionFromGetOne, SupporterTiers } from "petition";
+import { defaultPetitionFromGetOne, defaultUser, petitionCategory } from "../utils/defaultStates";
 import axios from "axios";
-import {API_BASE_URL} from "../config";
+import { API_BASE_URL } from "../config";
 import NavBar from "./NavBar";
-import {Box, Grid, Grow, Typography} from "@mui/material";
-import {User} from "user";
+import { Box, Grid, Grow, Typography } from "@mui/material";
+import { User } from "user";
 import PetitionSignersTable from "./PetitionSignersTable";
 import SupportTierExploreTable from "./SupportTierExploreTable";
 import InnerPetitionTable from "./InnerPetitionTable";
-import {formatTimestamp} from "../utils/timestampFormatting";
+import { formatTimestamp } from "../utils/timestampFormatting";
 
 const ExplorePetition = () => {
     const { id } = useParams();
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [petitionImage, setPetitionImage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    const [petitionOwnerUserInformation, setPetitionOwnerUserInformation] = useState<User>(defaultUser);
+    const [petitionOwnerUserInformation, setPetitionOwnerUserInformation] =
+        useState<User>(defaultUser);
     const [petitionOwnerUserImage, setPetitionOwnerUserImage] = useState("");
     const [minSupportTierCost, setMinSupportTierCost] = useState(0);
     const [errorFlag, setErrorFlag] = useState(false);
@@ -27,19 +28,22 @@ const ExplorePetition = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [petitionInformation
-                      ,petitionImage
-                      ,petitionOwnerInformation] = await Promise.all([
-                    axios.get(API_BASE_URL + '/petitions/' + id),
-                    axios.get(API_BASE_URL + '/petitions/' + id + '/image', { responseType: 'blob' }),
-                    axios.get(API_BASE_URL + '/users/' + id)
-                ]);
+                const [petitionInformation, petitionImage, petitionOwnerInformation] =
+                    await Promise.all([
+                        axios.get(API_BASE_URL + "/petitions/" + id),
+                        axios.get(API_BASE_URL + "/petitions/" + id + "/image", {
+                            responseType: "blob",
+                        }),
+                        axios.get(API_BASE_URL + "/users/" + id),
+                    ]);
 
-                petitionInformation.data.creationDate = formatTimestamp(petitionInformation.data.creationDate);
+                petitionInformation.data.creationDate = formatTimestamp(
+                    petitionInformation.data.creationDate,
+                );
                 setPetition(petitionInformation.data);
                 const imageUrl = URL.createObjectURL(petitionImage.data);
                 setPetitionImage(imageUrl);
-                setPetitionOwnerUserInformation(petitionOwnerInformation.data)
+                setPetitionOwnerUserInformation(petitionOwnerInformation.data);
                 findMinSupportTierCost(petitionInformation.data.supportTiers);
                 setIsLoading(false);
                 setChecked(true);
@@ -51,8 +55,8 @@ const ExplorePetition = () => {
 
         const fetchPetitionOwnerImage = async () => {
             try {
-                const response = await axios.get(API_BASE_URL + '/users/' + id + '/image', {
-                    responseType: 'blob'
+                const response = await axios.get(API_BASE_URL + "/users/" + id + "/image", {
+                    responseType: "blob",
                 });
                 setErrorFlag(false);
                 setErrorMessage("");
@@ -62,68 +66,110 @@ const ExplorePetition = () => {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());
             }
-        }
+        };
 
         fetchData();
         fetchPetitionOwnerImage();
     }, [id]);
 
-    console.log(petitionOwnerUserInformation.firstName);
-
     const findMinSupportTierCost = (supportTiersInformation: SupporterTiers[]) => {
-        const minSupportCost = Math.min(...supportTiersInformation.map(obj => obj.cost));
+        const minSupportCost = Math.min(...supportTiersInformation.map((obj) => obj.cost));
         setMinSupportTierCost(minSupportCost);
-    }
+    };
 
     return (
         <>
-            <NavBar callbackSearchInput={() => { }} searchInput={""} includeSearchBar={false} />
-            <Grow in={checked} style={{ transformOrigin: '0 0 0' }} {...(checked ? { timeout: 350 } : {})}>
-                <Grid container spacing={2} sx={{ paddingTop: 20, paddingLeft: 7, paddingBottom: 4 }}>
+            <NavBar callbackSearchInput={() => {}} searchInput={""} includeSearchBar={false} />
+            <Grow
+                in={checked}
+                style={{ transformOrigin: "0 0 0" }}
+                {...(checked ? { timeout: 350 } : {})}
+            >
+                <Grid
+                    container
+                    spacing={2}
+                    sx={{ paddingTop: 20, paddingLeft: 7, paddingBottom: 4 }}
+                >
                     <Grid item xs={4}>
                         <img
-                            style={{ height: 320, width: 320, objectFit: "cover", borderRadius: '15%' }}
+                            style={{
+                                height: 320,
+                                width: 320,
+                                objectFit: "cover",
+                                borderRadius: "15%",
+                            }}
                             src={petitionImage}
                             alt="petition-image"
                         />
                     </Grid>
-                    <Grid item xs={8} sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "flex-start",
-                        textAlign: "left"
-                    }}>
+                    <Grid
+                        item
+                        xs={8}
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                            textAlign: "left",
+                        }}
+                    >
                         <Typography variant={"h1"} sx={{ color: "white", fontSize: 40 }}>
                             {petition.title}
                         </Typography>
-                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "3rem", maxWidth: 600 }}>
+                        <Typography
+                            variant={"h3"}
+                            sx={{
+                                color: "white",
+                                fontSize: 20,
+                                marginBottom: "3rem",
+                                maxWidth: 600,
+                            }}
+                        >
                             {petition.description}
                         </Typography>
-                        <Typography variant={"body2"} sx={{ color: "white", fontSize: 15, maxWidth: 600 }}>
-                            {"Created "}{petition.creationDate}
+                        <Typography
+                            variant={"body2"}
+                            sx={{ color: "white", fontSize: 15, maxWidth: 600 }}
+                        >
+                            {"Created "}
+                            {petition.creationDate}
                         </Typography>
-                        <Typography variant={"body2"} sx={{ color: "white", fontSize: 15, maxWidth: 600 }}>
-                            {"Money raised: $"}{petition.moneyRaised}
+                        <Typography
+                            variant={"body2"}
+                            sx={{ color: "white", fontSize: 15, maxWidth: 600 }}
+                        >
+                            {"Money raised: $"}
+                            {petition.moneyRaised}
                         </Typography>
-                        <Typography variant={"body2"} sx={{ color: "white", fontSize: 15, marginBottom: "1rem", maxWidth: 600 }}>
-                            {"Number of supporters: "}{petition.numberOfSupporters}
+                        <Typography
+                            variant={"body2"}
+                            sx={{
+                                color: "white",
+                                fontSize: 15,
+                                marginBottom: "1rem",
+                                maxWidth: 600,
+                            }}
+                        >
+                            {"Number of supporters: "}
+                            {petition.numberOfSupporters}
                         </Typography>
-
                     </Grid>
                     <Grid item xs={4}>
                         <Typography variant={"subtitle1"} sx={{ color: "white", fontSize: 15 }}>
                             Owned By:
                         </Typography>
-                        <Typography variant={"h6"} sx={{
-                            color: "white",
-                            fontSize: 20,
-                            display: 'flex',
-                            justifyContent: "center",
-                            alignItems: 'center',
-                            alignContent: "center",
-                            marginTop: 2
-                        }}>
+                        <Typography
+                            variant={"h6"}
+                            sx={{
+                                color: "white",
+                                fontSize: 20,
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                alignContent: "center",
+                                marginTop: 2,
+                            }}
+                        >
                             {petitionOwnerUserImage !== "" ? (
                                 <img
                                     src={petitionOwnerUserImage}
@@ -132,8 +178,8 @@ const ExplorePetition = () => {
                                     alt={"owner-photo"}
                                     title={"owner-photo"}
                                     style={{
-                                        borderRadius: '50%',
-                                        objectFit: 'cover',
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
                                     }}
                                 />
                             ) : (
@@ -144,39 +190,61 @@ const ExplorePetition = () => {
                                     alt={"owner-default-photo"}
                                     title={"owner-default-photo"}
                                     style={{
-                                        borderRadius: '50%',
-                                        objectFit: 'cover',
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
                                     }}
                                 />
                             )}
-                            <span style={{ marginLeft: '8px' }}>
-                                {petitionOwnerUserInformation.firstName} {petitionOwnerUserInformation.lastName}
+                            <span style={{ marginLeft: "8px" }}>
+                                {petitionOwnerUserInformation.firstName}{" "}
+                                {petitionOwnerUserInformation.lastName}
                             </span>
                         </Typography>
-
                     </Grid>
-                    <Grid item xs={8} sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start"
-
-                    }}>
-                        {!isLoading && (
-                            <PetitionSignersTable petitionId={petition.petitionId} />
-                        )}
+                    <Grid
+                        item
+                        xs={8}
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "flex-start",
+                        }}
+                    >
+                        {!isLoading && <PetitionSignersTable petitionId={petition.petitionId} />}
                     </Grid>
-                    <Grid item xs={4} sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center"
-                    }}>
-                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", alignItems: "center" }}>
+                    <Grid
+                        item
+                        xs={4}
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography
+                            variant={"h3"}
+                            sx={{
+                                color: "white",
+                                fontSize: 20,
+                                marginBottom: "1rem",
+                                alignItems: "center",
+                            }}
+                        >
                             {"Support Tiers"}
                         </Typography>
-                        <SupportTierExploreTable givenPetition={petition}/>
+                        <SupportTierExploreTable givenPetition={petition} />
                     </Grid>
-                    <Grid item xs={6} sx={{ maxWidth: 10, textAlign: 'left' }}>
-                        <Typography variant={"h3"} sx={{ color: "white", fontSize: 20, marginBottom: "1rem", alignItems: "center", paddingLeft: 33}}>
+                    <Grid item xs={6} sx={{ maxWidth: 10, textAlign: "left" }}>
+                        <Typography
+                            variant={"h3"}
+                            sx={{
+                                color: "white",
+                                fontSize: 20,
+                                marginBottom: "1rem",
+                                alignItems: "center",
+                                paddingLeft: 33,
+                            }}
+                        >
                             {"Related Petitions"}
                         </Typography>
                         <Box maxWidth={10}>
@@ -189,11 +257,10 @@ const ExplorePetition = () => {
                             />
                         </Box>
                     </Grid>
-
                 </Grid>
             </Grow>
         </>
     );
-}
+};
 
 export default ExplorePetition;

@@ -1,7 +1,7 @@
-declare module 'searchQuery' {
+declare module "searchQuery" {
     export interface searchQuery {
-        category: string[]
-        minSupportingCost: number
-        sortBy: string
+        category: string[];
+        minSupportingCost: number;
+        sortBy: string;
     }
 }

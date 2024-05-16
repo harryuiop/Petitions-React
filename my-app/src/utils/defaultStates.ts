@@ -1,51 +1,51 @@
-import {PetitionFromGetOne} from "petition";
-import {User} from "user";
-import {SupporterDirectQuery} from "supporter";
+import { PetitionFromGetOne } from "petition";
+import { User } from "user";
+import { SupporterDirectQuery } from "supporter";
 
 export const defaultPetitionFromGetOne: PetitionFromGetOne = {
-    description: '',
+    description: "",
     moneyRaised: 0,
     supportTiers: [],
     petitionId: 0,
-    title: '',
+    title: "",
     categoryId: 0,
     ownerId: 0,
-    ownerFirstName: '',
-    ownerLastName: '',
+    ownerFirstName: "",
+    ownerLastName: "",
     numberOfSupporters: 0,
-    creationDate: '',
+    creationDate: "",
 };
 
 export const defaultUser: User = {
-    userId: -1,
+    userId: -2,
     firstName: "",
     lastName: "",
-    email: ""
+    email: "",
 };
 
 export const defaultSupporterFromQuery: SupporterDirectQuery = {
-    "supportId": -1,
-    "supportTierId": -1,
-    "message": "",
-    "supporterId": -1,
-    "supporterFirstName": "",
-    "supporterLastName": "",
-    "timestamp": ""
-}
+    supportId: -1,
+    supportTierId: -1,
+    message: "",
+    supporterId: -1,
+    supporterFirstName: "",
+    supporterLastName: "",
+    timestamp: "",
+};
 
 export const petitionCategory: { [key: number]: string } = {
-    1:  "Wildlife",
-    2:  "Environmental Causes",
-    3:  "Animal Rights",
-    4:  "Health and Wellness",
-    5:  "Education",
-    6:  "Human Rights",
-    8:  "Arts and Culture",
-    7:  "Technology and Innovation",
-    9:  "Community Development",
+    1: "Wildlife",
+    2: "Environmental Causes",
+    3: "Animal Rights",
+    4: "Health and Wellness",
+    5: "Education",
+    6: "Human Rights",
+    8: "Arts and Culture",
+    7: "Technology and Innovation",
+    9: "Community Development",
     10: "Economic Empowerment",
     11: "Science and Research",
-    12: "Sports and Recreation"
+    12: "Sports and Recreation",
 };
 
 export const sortByCategorys: { [key: number]: { code: string; desc: string } } = {
@@ -54,5 +54,5 @@ export const sortByCategorys: { [key: number]: { code: string; desc: string } } 
     3: { code: "COST_ASC", desc: "by cost of cheapest support tier ascending" },
     4: { code: "COST_DESC", desc: "by cost of cheapest support tier descending" },
     5: { code: "CREATED_ASC", desc: "chronologically in order of creation date oldest-newest" },
-    6: { code: "CREATED_DESC", desc: "chronologically in order of creation date newest-oldest" }
+    6: { code: "CREATED_DESC", desc: "chronologically in order of creation date newest-oldest" },
 };

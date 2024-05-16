@@ -4,29 +4,36 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableRow,
     TablePagination,
+    TableRow,
 } from "@mui/material";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {API_BASE_URL} from "../config";
-import {PetitionFromGetAll, PetitionFromGetOne} from "petition";
+import { API_BASE_URL } from "../config";
+import { PetitionFromGetAll, PetitionFromGetOne } from "petition";
 import PetitionCard from "./PetitionCard";
-import {defaultPetitionFromGetOne, petitionCategory} from "../utils/defaultStates";
+import { defaultPetitionFromGetOne, petitionCategory } from "../utils/defaultStates";
 
-const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sortBy, givenPetition}: {
-    searchInput: string,
-    selectedOptions: string[],
-    maxSupporterCost: string,
-    sortBy: string,
-    givenPetition: PetitionFromGetOne
+const InnerPetitionTable = ({
+    searchInput,
+    selectedOptions,
+    maxSupporterCost,
+    sortBy,
+    givenPetition,
+}: {
+    searchInput: string;
+    selectedOptions: string[];
+    maxSupporterCost: string;
+    sortBy: string;
+    givenPetition: PetitionFromGetOne;
 }) => {
-    const [viewedPetition, setViewedPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne)
+    const [viewedPetition, setViewedPetition] =
+        useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [allPetitionsFromGetAll, setAllPetitionsFromGetAll] = useState<PetitionFromGetAll[]>([]);
     const [allPetitionsFromGetOne, setAllPetitionsFromGetOne] = useState<PetitionFromGetOne[]>([]);
-    const [allFilteredPetitions, setAllFilteredPetitions] = useState<PetitionFromGetOne[]>([])
+    const [allFilteredPetitions, setAllFilteredPetitions] = useState<PetitionFromGetOne[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -35,11 +42,13 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
         const fetchAllPetitions = async () => {
             try {
                 setIsLoading(true);
-                if (sortBy !== '') {
-                    const response = await axios.get(API_BASE_URL + '/petitions/?sortBy=' + sortBy);
+                if (sortBy !== "") {
+                    const response = await axios.get(API_BASE_URL + "/petitions/?sortBy=" + sortBy);
                     setAllPetitionsFromGetAll(response.data.petitions);
                 } else {
-                    const response = await axios.get(API_BASE_URL + '/petitions/?sortBy=CREATED_ASC');
+                    const response = await axios.get(
+                        API_BASE_URL + "/petitions/?sortBy=CREATED_ASC",
+                    );
                     setAllPetitionsFromGetAll(response.data.petitions);
                 }
                 setErrorFlag(false);
@@ -58,7 +67,7 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
         const fetchPetitionDetails = async (petitionIds: number[]) => {
             try {
                 const promises = petitionIds.map(async (petitionId: number) => {
-                    const response = await axios.get(API_BASE_URL + '/petitions/' + petitionId);
+                    const response = await axios.get(API_BASE_URL + "/petitions/" + petitionId);
                     return response.data;
                 });
                 const petitionDetails = await Promise.all(promises);
@@ -70,7 +79,7 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
         };
 
         // Extracting petition ids from allPetitionsFromGetAll
-        const petitionIds = allPetitionsFromGetAll.map(petition => petition.petitionId);
+        const petitionIds = allPetitionsFromGetAll.map((petition) => petition.petitionId);
 
         // Fetch details for each petition
         fetchPetitionDetails(petitionIds);
@@ -91,17 +100,24 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
             }
 
             if (maxSupporterCost !== "") {
-                if (Math.min(...petition.supportTiers.map(obj => obj.cost)) > parseInt(maxSupporterCost, 10)) {
-                    return false
+                if (
+                    Math.min(...petition.supportTiers.map((obj) => obj.cost)) >
+                    parseInt(maxSupporterCost, 10)
+                ) {
+                    return false;
                 }
             }
 
             if (selectedOptions.includes(categoryString)) {
-                return ((petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-                    petition.description.toLowerCase().includes(searchInput.toLowerCase())))
+                return (
+                    petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    petition.description.toLowerCase().includes(searchInput.toLowerCase())
+                );
             } else if (selectedOptions.length === 0) {
-                return (petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-                    petition.description.toLowerCase().includes(searchInput.toLowerCase()))
+                return (
+                    petition.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    petition.description.toLowerCase().includes(searchInput.toLowerCase())
+                );
             } else if (selectedOptions.length === 0) {
                 return true;
             }
@@ -110,41 +126,42 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
         setAllFilteredPetitions(filteredPetitions);
     }, [searchInput, selectedOptions, maxSupporterCost, allPetitionsFromGetOne, givenPetition]);
 
-    const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => setPage(newPage);
+    const handleChangePage = (event: any, newPage: React.SetStateAction<number>) =>
+        setPage(newPage);
 
-    const handleChangeRowsPerPage = (event: { target: { value: string; }; }) => {
+    const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
     return (
-        <Paper sx={{minWidth: 718, maxWidth: 930}}>
+        <Paper sx={{ minWidth: 718, maxWidth: 930 }}>
             <TableContainer>
                 <Table aria-label="custom pagination table">
                     <TableBody>
                         {isLoading ? (
                             <></>
-                        ) : (
-                            allPetitionsFromGetOne.length > 0 ? (
-                                rowsPerPage > 0 ? (
-                                    allFilteredPetitions
-                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                ) : (
-                                    allFilteredPetitions
-                                )
+                        ) : allPetitionsFromGetOne.length > 0 ? (
+                            (rowsPerPage > 0
+                                ? allFilteredPetitions.slice(
+                                      page * rowsPerPage,
+                                      page * rowsPerPage + rowsPerPage,
+                                  )
+                                : allFilteredPetitions
                             ).map((currentPetition) => (
                                 <TableRow key={currentPetition.title}>
                                     <TableCell component="th" scope="row">
                                         <PetitionCard
                                             key={currentPetition.petitionId}
-                                            petitionId={currentPetition.petitionId}/>
+                                            petitionId={currentPetition.petitionId}
+                                        />
                                     </TableCell>
                                 </TableRow>
-                            )) : (
-                                <TableRow>
-                                    <TableCell>{'No petitions available'}</TableCell>
-                                </TableRow>
-                            )
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell>{"No petitions available"}</TableCell>
+                            </TableRow>
                         )}
                     </TableBody>
                 </Table>
@@ -165,6 +182,6 @@ const InnerPetitionTable = ({searchInput, selectedOptions, maxSupporterCost, sor
             />
         </Paper>
     );
-}
+};
 
 export default InnerPetitionTable;

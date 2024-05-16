@@ -1,4 +1,4 @@
-declare module 'petition' {
+declare module "petition" {
     export interface SupporterTiers {
         supportTierId: number;
         title: string;
@@ -29,6 +29,6 @@ declare module 'petition' {
         ownerFirstName: string;
         ownerLastName: string;
         numberOfSupporters: number;
-        supportingCost: number
+        supportingCost: number;
     }
 }
