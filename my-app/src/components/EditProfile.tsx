@@ -435,7 +435,7 @@ const EditProfile = () => {
                                     </Typography>
                                 )}
                                 <Button variant="outlined" color="success" onClick={handleSubmit}>
-                                    Confirm
+                                    Confirm Changes
                                 </Button>
                                 <Button
                                     component={Link}

@@ -6,6 +6,11 @@ declare module "petition" {
         cost: number;
     }
 
+    export interface CategoryRequest {
+        categoryId: string;
+        name: string;
+    }
+
     export interface SupporterTiersCreate {
         title: string;
         description: string;
