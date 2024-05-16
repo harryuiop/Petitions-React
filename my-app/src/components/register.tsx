@@ -23,8 +23,6 @@ const Register = () => {
     const [photoInputted, setPhotoInputted] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
-    const [firstNameError, setFirstNameError] = useState(false);
-    const [lastNameError, setLastNameError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [passwordVisibility, setPasswordVisibility] = useState(true);
 

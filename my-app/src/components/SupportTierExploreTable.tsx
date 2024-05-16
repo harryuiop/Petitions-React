@@ -1,18 +1,18 @@
 import {
+    Card,
     Table,
     TableBody,
     TableCell,
     TableContainer,
-    Card,
     TableRow,
     Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { PetitionFromGetOne, SupporterTiers } from "petition";
+import { PetitionFromGetOne, SupporterTiersGet } from "petition";
 import { grey } from "@mui/material/colors";
 
 const SupportTierExploreTable = ({ givenPetition }: { givenPetition: PetitionFromGetOne }) => {
-    const [allSupportTiers, setAllSupportTiers] = useState<SupporterTiers[]>([]);
+    const [allSupportTiers, setAllSupportTiers] = useState<SupporterTiersGet[]>([]);
 
     useEffect(() => {
         setAllSupportTiers(givenPetition.supportTiers);

@@ -1,13 +1,10 @@
-import { AppBar, Toolbar, Typography, Stack, Button } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { AppBar, Button, Stack, Toolbar, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import { blue, grey } from "@mui/material/colors";
-import React, { useState } from "react";
+import React from "react";
 import IconButton from "@mui/material/IconButton";
-import SearchIcon from "@mui/icons-material/Search";
-import TextField from "@mui/material/TextField";
 import SearchBar from "./SearchBar";
 import HandshakeIcon from "@mui/icons-material/Handshake";
-import { UserAuth } from "user";
 import { useUserAuthDetailsContext } from "../utils/userAuthContext";
 
 const NavBar = ({
@@ -56,20 +53,20 @@ const NavBar = ({
                 <Stack direction="row" spacing={2}>
                     {userAuth.authUser.loggedIn ? (
                         <>
-                            {" "}
+                            <Button component={Link} to={"/petition/create"}>
+                                Create Petition
+                            </Button>
                             <Button
                                 component={Link}
                                 to={"/user/profile/" + userAuth.authUser.userId}
                             >
-                                {" "}
-                                Profile{" "}
-                            </Button>{" "}
+                                Profile
+                            </Button>
                             <Button onClick={() => userAuth.handleLogout()}> Log Out </Button>
                         </>
                     ) : (
                         <Button component={Link} to="/signin">
-                            {" "}
-                            Sign in{" "}
+                            Sign in
                         </Button>
                     )}
                 </Stack>

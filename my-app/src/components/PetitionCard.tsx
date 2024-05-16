@@ -1,20 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL } from "../config";
 import axios from "axios";
-import { Link, useParams } from "react-router-dom";
-import {
-    Box,
-    Card,
-    CardActionArea,
-    CardContent,
-    CardMedia,
-    Grow,
-    Skeleton,
-    Typography,
-} from "@mui/material";
-import { PetitionFromGetOne, SupporterTiers } from "petition";
+import { Link } from "react-router-dom";
+import { Box, Card, CardActionArea, CardContent, CardMedia, Grow, Typography } from "@mui/material";
+import { PetitionFromGetOne, SupporterTiersGet } from "petition";
 import { grey } from "@mui/material/colors";
-import SkeletonCard from "./SkeletonCard";
 import { defaultPetitionFromGetOne, defaultUser, petitionCategory } from "../utils/defaultStates";
 import { User } from "user";
 import { formatTimestamp } from "../utils/timestampFormatting";
@@ -91,7 +81,7 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
             }
         };
 
-        const findMinSupportTierCost = (supportTiersInformation: SupporterTiers[]) => {
+        const findMinSupportTierCost = (supportTiersInformation: SupporterTiersGet[]) => {
             const minSupportCost = Math.min(...supportTiersInformation.map((obj) => obj.cost));
             setMinSupportTierCost(minSupportCost);
         };

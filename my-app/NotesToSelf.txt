@@ -2,3 +2,6 @@ Things to Fix:
 1. Images in register to be complete
 2. No sign out snackbar
 3. Refresh on profile send us back to "/"
+4. Add profile display to register
+5. Fix image uploads
+6. Implement snack bar on edit

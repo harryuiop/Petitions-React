@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { PetitionFromGetOne, SupporterTiers } from "petition";
+import { PetitionFromGetOne, SupporterTiersGet } from "petition";
 import { defaultPetitionFromGetOne, defaultUser, petitionCategory } from "../utils/defaultStates";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
@@ -72,7 +72,7 @@ const ExplorePetition = () => {
         fetchPetitionOwnerImage();
     }, [id]);
 
-    const findMinSupportTierCost = (supportTiersInformation: SupporterTiers[]) => {
+    const findMinSupportTierCost = (supportTiersInformation: SupporterTiersGet[]) => {
         const minSupportCost = Math.min(...supportTiersInformation.map((obj) => obj.cost));
         setMinSupportTierCost(minSupportCost);
     };

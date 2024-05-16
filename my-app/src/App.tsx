@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NotFound from "./components/NotFound";
 import "./globalStyles.css";
 import "./App.css";
@@ -11,6 +11,7 @@ import { UserAuth } from "user";
 import { userAuthDetailsContext } from "./utils/userAuthContext";
 import UserProfile from "./components/UserProfile";
 import EditProfile from "./components/EditProfile";
+import CreatePetition from "./components/CreatePetition";
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -53,6 +54,11 @@ function App() {
                 <Router>
                     <div>
                         <Routes>
+                            <Route
+                                path="petition/:id/:petitionid/edit"
+                                element={<CreatePetition />}
+                            />
+                            <Route path="petition/create" element={<CreatePetition />} />
                             <Route path="user/profile/:id" element={<UserProfile />} />
                             <Route path="user/profile/:id/edit" element={<EditProfile />} />
                             <Route path="/" element={<Home />} />
