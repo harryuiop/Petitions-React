@@ -91,7 +91,6 @@ const EditProfile = () => {
                 const url = URL.createObjectURL(response.data);
                 setUserProfilePhoto(url);
                 setPhotoInputted(true);
-                console.log(url);
             } catch (error: any) {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());

@@ -22,19 +22,23 @@ function App() {
     });
 
     useEffect(() => {
-        const userId = localStorage.getItem("userId");
-        const token = localStorage.getItem("token");
-        if (userId === null || token === null) {
-            setAuthUser({ userId: -1, token: "", loggedIn: false });
-        } else {
-            setLoggedIn(true);
-            setAuthUser({
-                userId: parseInt(userId, 10),
-                token: localStorage.getItem("token") as string,
-                loggedIn: true,
-            });
-        }
-    }, [loggedIn]);
+        const loadContext = () => {
+            const userId = localStorage.getItem("userId");
+            const token = localStorage.getItem("token");
+            if (userId === null || token === null) {
+                setAuthUser({ userId: -1, token: "", loggedIn: false });
+            } else {
+                setAuthUser({
+                    userId: parseInt(userId, 10),
+                    token: localStorage.getItem("token") as string,
+                    loggedIn: true,
+                });
+                setLoggedIn(true);
+            }
+        };
+
+        loadContext();
+    }, []);
 
     const handleLogin = (user: UserAuth) => {
         setLoggedIn(true);

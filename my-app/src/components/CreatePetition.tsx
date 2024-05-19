@@ -135,8 +135,8 @@ const CreatePetition = () => {
                 );
             }
 
+            // ToDo: ??? below
             localStorage.setItem("isLoggedIn", "true");
-            console.log("petition created");
             navigate("/" + id);
         } catch (error: any) {
             if (error.response.status === 400) {

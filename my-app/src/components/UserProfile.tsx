@@ -70,8 +70,6 @@ const UserProfile = () => {
 
         fetchUserInformation();
         fetchUserProfileImage();
-        console.log(userAuth.authUser.userId);
-        // console.log(userInformation);
         setChecked(true);
     }, []);
 

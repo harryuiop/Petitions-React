@@ -21,92 +21,31 @@ const MyPetitionsTable = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [usersPetitions, setUsersPetitions] = useState<PetitionFromGetOne[]>([]);
-    const [usersSupportedPetitions, setUsersSupportedPetitions] = useState<PetitionFromGetOne[]>(
-        [],
-    );
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
 
-    const [test, setTest] = useState<number[]>([]);
-
     useEffect(() => {
-        fetchData();
+        const fetchAllRelatedPetitions = async () => {
+            try {
+                if (userAuth.authUser.userId != -1) {
+                    const response = await axios.get(
+                        API_BASE_URL +
+                            "/petitions/?ownerId=" +
+                            userAuth.authUser.userId +
+                            "&supporterId=" +
+                            userAuth.authUser.userId,
+                    );
+                    setUsersPetitions(response.data);
+                }
+            } catch (error: any) {
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
+            }
+        };
+
+        fetchAllRelatedPetitions();
     }, []);
-
-    console.log(test);
-
-    const fetchData = async () => {
-        await fetchAllUsersPetition();
-
-        const allPetitions = await getAllPetitions();
-        const allSupporters = await getAllSupporters(allPetitions.petitions);
-
-        if (allSupporters) {
-            const indexedSupporters = allSupporters.map((supporterArray, index) => ({
-                supporterArray,
-                index,
-            }));
-
-            const filteredSupporters = indexedSupporters.filter((indexedSupporters) =>
-                indexedSupporters.supporterArray.some(
-                    (supporter) => supporter.supporterId === userAuth.authUser.userId,
-                ),
-            );
-            setTest(filteredSupporters.map((petition) => petition.index));
-        }
-    };
-
-    const fetchAllUsersPetition = async () => {
-        try {
-            const result = await axios.get(
-                API_BASE_URL + "/petitions?ownerId=" + userAuth.authUser.userId,
-            );
-            setUsersPetitions(result.data.petitions);
-
-            const ownersPetitionIds = result.data.petitions.map(
-                (petition: PetitionFromGetAll) => petition.petitionId,
-            );
-        } catch (error: any) {
-            setErrorFlag(true);
-            setErrorMessage(error.toString());
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const getAllPetitions = async () => {
-        try {
-            const response = await axios.get(API_BASE_URL + "/petitions");
-            setErrorFlag(false);
-            setErrorMessage("");
-            return response.data;
-        } catch (error: any) {
-            setErrorFlag(true);
-            setErrorMessage(error.toString());
-            return [];
-        }
-    };
-
-    const getAllSupporters = async (allPetitions: PetitionFromGetOne[]) => {
-        try {
-            const allSupportersPromises = allPetitions.map(async (petition) => {
-                const response = await axios.get(
-                    API_BASE_URL + "/petitions/" + petition.petitionId + "/supporters",
-                );
-                return response.data;
-            });
-
-            const allSupporters: SupporterDirectQuery[][] =
-                await Promise.all(allSupportersPromises);
-            setErrorFlag(false);
-            setErrorMessage("");
-            return allSupporters;
-        } catch (error: any) {
-            setErrorFlag(true);
-            setErrorMessage(error.toString());
-        }
-    };
 
     const handleChangePage = (event: any, newPage: React.SetStateAction<number>) =>
         setPage(newPage);
@@ -115,8 +54,6 @@ const MyPetitionsTable = () => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
-
-    console.log(test);
 
     return (
         <>
@@ -157,7 +94,7 @@ const MyPetitionsTable = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={usersPetitions.length}
+                    count={isNaN(usersPetitions.length) ? 0 : usersPetitions.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

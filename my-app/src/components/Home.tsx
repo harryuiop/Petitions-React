@@ -16,7 +16,7 @@ const Home = () => {
             setLoginSnackbarOpen(true);
             localStorage.removeItem("isLoggedIn");
         }
-    }, []);
+    }, [userAuth.authUser.userId]);
 
     const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
