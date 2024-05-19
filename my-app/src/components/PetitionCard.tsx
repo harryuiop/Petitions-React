@@ -10,7 +10,6 @@ import { User } from "user";
 import { formatTimestamp } from "../utils/timestampFormatting";
 
 const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
-    const [id, setId] = useState(petitionId);
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [petitionImage, setPetitionImage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -23,76 +22,77 @@ const PetitionCard = ({ petitionId }: { petitionId: Number }) => {
     const [checked, setChecked] = useState(false);
 
     useEffect(() => {
-        const getPetitionInformation = async () => {
-            await axios.get(API_BASE_URL + "/petitions/" + id).then(
-                (response) => {
-                    setErrorFlag(false);
-                    setErrorMessage("");
-                    response.data.creationDate = formatTimestamp(response.data.creationDate);
-                    setPetition(response.data);
-                    findMinSupportTierCost(response.data.supportTiers);
-                },
-                (error) => {
-                    setErrorFlag(true);
-                    setErrorMessage(error.toString());
-                },
-            );
-        };
-
-        const getPetitionImage = async () => {
-            try {
-                const response = await axios.get(API_BASE_URL + "/petitions/" + id + "/image", {
-                    responseType: "blob",
-                });
-                setErrorFlag(false);
-                setErrorMessage("");
-                const url = URL.createObjectURL(response.data);
-                setPetitionImage(url);
-            } catch (error: any) {
-                setErrorFlag(true);
-                setErrorMessage(error.toString());
-            }
-        };
-
-        const getPetitionOwnerInformation = async () => {
-            try {
-                const response = await axios.get(API_BASE_URL + "/users/" + id);
-                setErrorFlag(false);
-                setErrorMessage("");
-                setPetitonOwnerUserInformation(response.data);
-            } catch (error: any) {
-                setErrorFlag(true);
-                setErrorMessage(error.toString());
-            }
-        };
-
-        const getPetitionOwnerImage = async () => {
-            try {
-                const response = await axios.get(API_BASE_URL + "/users/" + id + "/image", {
-                    responseType: "blob",
-                });
-                setErrorFlag(false);
-                setErrorMessage("");
-                const url = URL.createObjectURL(response.data);
-                setPetitonOwnerUserImage(url);
-            } catch (error: any) {
-                setErrorFlag(true);
-                setErrorMessage(error.toString());
-            }
-        };
-
-        const findMinSupportTierCost = (supportTiersInformation: SupporterTiersGet[]) => {
-            const minSupportCost = Math.min(...supportTiersInformation.map((obj) => obj.cost));
-            setMinSupportTierCost(minSupportCost);
-        };
-
-        getPetitionImage();
         getPetitionInformation();
-        getPetitionOwnerInformation();
-        getPetitionOwnerImage();
-        setIsLoading(false);
-        setChecked(true);
-    }, [id]);
+    }, [petitionId]);
+
+    const findMinSupportTierCost = (supportTiersInformation: SupporterTiersGet[]) => {
+        const minSupportCost = Math.min(...supportTiersInformation.map((obj) => obj.cost));
+        setMinSupportTierCost(minSupportCost);
+    };
+
+    const getPetitionInformation = async () => {
+        try {
+            if (petitionId !== 0) {
+                const response = await axios.get(API_BASE_URL + "/petitions/" + petitionId);
+                setErrorFlag(false);
+                setErrorMessage("");
+                response.data.creationDate = formatTimestamp(response.data.creationDate);
+                setPetition(response.data);
+                findMinSupportTierCost(response.data.supportTiers);
+
+                await getPetitionOwnerInformation(response.data.ownerId);
+                await getPetitionImage(response.data.petitionId);
+                await getPetitionOwnerImage(response.data.ownerId);
+                setIsLoading(false);
+                setChecked(true);
+            }
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const getPetitionOwnerInformation = async (ownerId: string) => {
+        try {
+            const response = await axios.get(API_BASE_URL + "/users/" + ownerId);
+            setErrorFlag(false);
+            setErrorMessage("");
+            setPetitonOwnerUserInformation(response.data);
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const getPetitionImage = async (petitionId: string) => {
+        try {
+            const response = await axios.get(API_BASE_URL + "/petitions/" + petitionId + "/image", {
+                responseType: "blob",
+            });
+            setErrorFlag(false);
+            setErrorMessage("");
+            const url = URL.createObjectURL(response.data);
+            setPetitionImage(url);
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const getPetitionOwnerImage = async (ownerId: string) => {
+        try {
+            const response = await axios.get(API_BASE_URL + "/users/" + ownerId + "/image", {
+                responseType: "blob",
+            });
+            setErrorFlag(false);
+            setErrorMessage("");
+            const url = URL.createObjectURL(response.data);
+            setPetitonOwnerUserImage(url);
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
 
     return (
         <>

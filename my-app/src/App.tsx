@@ -63,6 +63,7 @@ function App() {
                                 element={<CreatePetition />}
                             />
                             <Route path="petition/create" element={<CreatePetition />} />
+                            <Route path="petition/:id/edit" element={<EditProfile />} />
                             <Route path="user/profile/:id" element={<UserProfile />} />
                             <Route path="user/profile/:id/edit" element={<EditProfile />} />
                             <Route path="/" element={<Home />} />

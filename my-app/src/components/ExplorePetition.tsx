@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { PetitionFromGetOne, SupporterTiersGet } from "petition";
 import { defaultPetitionFromGetOne, defaultUser, petitionCategory } from "../utils/defaultStates";
@@ -26,51 +26,67 @@ const ExplorePetition = () => {
     const [checked, setChecked] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [petitionInformation, petitionImage, petitionOwnerInformation] =
-                    await Promise.all([
-                        axios.get(API_BASE_URL + "/petitions/" + id),
-                        axios.get(API_BASE_URL + "/petitions/" + id + "/image", {
-                            responseType: "blob",
-                        }),
-                        axios.get(API_BASE_URL + "/users/" + id),
-                    ]);
-
-                petitionInformation.data.creationDate = formatTimestamp(
-                    petitionInformation.data.creationDate,
-                );
-                setPetition(petitionInformation.data);
-                const imageUrl = URL.createObjectURL(petitionImage.data);
-                setPetitionImage(imageUrl);
-                setPetitionOwnerUserInformation(petitionOwnerInformation.data);
-                findMinSupportTierCost(petitionInformation.data.supportTiers);
-                setIsLoading(false);
-                setChecked(true);
-            } catch (error: any) {
-                setErrorFlag(true);
-                setErrorMessage(error.toString());
-            }
-        };
-
-        const fetchPetitionOwnerImage = async () => {
-            try {
-                const response = await axios.get(API_BASE_URL + "/users/" + id + "/image", {
-                    responseType: "blob",
-                });
-                setErrorFlag(false);
-                setErrorMessage("");
-                const url = URL.createObjectURL(response.data);
-                setPetitionOwnerUserImage(url);
-            } catch (error: any) {
-                setErrorFlag(true);
-                setErrorMessage(error.toString());
-            }
-        };
-
         fetchData();
-        fetchPetitionOwnerImage();
-    }, [id]);
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(API_BASE_URL + "/petitions/" + id);
+            response.data.creationDate = formatTimestamp(response.data.creationDate);
+            setPetition(response.data);
+            findMinSupportTierCost(response.data.supportTiers);
+            setIsLoading(false);
+            setChecked(true);
+            await fetchPetitionOwnerData(response.data.ownerId);
+            await fetchPetitionOwnerImage(response.data.ownerId);
+            await fetchPetitionImage(response.data.petitionId);
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const fetchPetitionOwnerData = async (ownerId: string) => {
+        try {
+            const response = await axios.get(API_BASE_URL + "/users/" + ownerId);
+            console.log(response);
+            setPetitionOwnerUserInformation(response.data);
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const fetchPetitionImage = async (petitionId: string) => {
+        try {
+            const petitionImage = await axios.get(
+                API_BASE_URL + "/petitions/" + petitionId + "/image",
+                {
+                    responseType: "blob",
+                },
+            );
+            const imageUrl = URL.createObjectURL(petitionImage.data);
+            setPetitionImage(imageUrl);
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const fetchPetitionOwnerImage = async (ownerId: string) => {
+        try {
+            const response = await axios.get(API_BASE_URL + "/users/" + ownerId + "/image", {
+                responseType: "blob",
+            });
+            setErrorFlag(false);
+            setErrorMessage("");
+            const url = URL.createObjectURL(response.data);
+            setPetitionOwnerUserImage(url);
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
 
     const findMinSupportTierCost = (supportTiersInformation: SupporterTiersGet[]) => {
         const minSupportCost = Math.min(...supportTiersInformation.map((obj) => obj.cost));
@@ -98,7 +114,7 @@ const ExplorePetition = () => {
                                 objectFit: "cover",
                                 borderRadius: "15%",
                             }}
-                            src={petitionImage}
+                            src={petitionImage === "" ? "/defaultProfileImage.jpg" : petitionImage}
                             alt="petition-image"
                         />
                     </Grid>

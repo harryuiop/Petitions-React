@@ -16,7 +16,7 @@ import {
 import PetitionCard from "./PetitionCard";
 import { SupporterDirectQuery } from "supporter";
 
-const MyPetitionsTable = () => {
+const MyPetitionsTable = ({ userId }: { userId: string }) => {
     const userAuth = useUserAuthDetailsContext();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -28,16 +28,18 @@ const MyPetitionsTable = () => {
     useEffect(() => {
         const fetchAllRelatedPetitions = async () => {
             try {
-                if (userAuth.authUser.userId != -1) {
-                    const response = await axios.get(
-                        API_BASE_URL +
-                            "/petitions/?ownerId=" +
-                            userAuth.authUser.userId +
-                            "&supporterId=" +
-                            userAuth.authUser.userId,
-                    );
-                    setUsersPetitions(response.data);
-                }
+                const ownedPetitionsResponse = await axios.get(
+                    API_BASE_URL + "/petitions/?ownerId=" + userId,
+                );
+                const supportedPetitionsResponse = await axios.get(
+                    API_BASE_URL + "/petitions/?supporterId=" + userId,
+                );
+
+                const ownedPetitions = ownedPetitionsResponse.data.petitions;
+                const supportedPetitions = supportedPetitionsResponse.data.petitions;
+
+                const combinedPetitions = [...ownedPetitions, ...supportedPetitions];
+                setUsersPetitions(combinedPetitions);
             } catch (error: any) {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());
@@ -45,6 +47,7 @@ const MyPetitionsTable = () => {
         };
 
         fetchAllRelatedPetitions();
+        setIsLoading(false);
     }, []);
 
     const handleChangePage = (event: any, newPage: React.SetStateAction<number>) =>
@@ -58,7 +61,7 @@ const MyPetitionsTable = () => {
     return (
         <>
             <Typography variant={"h3"} sx={{ fontSize: 25, color: "white", paddingBottom: 3 }}>
-                My Petitions
+                My Related Petitions
             </Typography>
             <Paper>
                 <TableContainer>
@@ -94,7 +97,7 @@ const MyPetitionsTable = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={isNaN(usersPetitions.length) ? 0 : usersPetitions.length}
+                    count={usersPetitions.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

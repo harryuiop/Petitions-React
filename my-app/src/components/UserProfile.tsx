@@ -161,7 +161,7 @@ const UserProfile = () => {
                             }}
                         ></Grid>
                         <Grid item xs={6} sx={{ maxWidth: 10, textAlign: "left" }}>
-                            <MyPetitionsTable />
+                            <MyPetitionsTable userId={id as string} />
                         </Grid>
                     </Grid>
                 </Grow>
