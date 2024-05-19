@@ -97,17 +97,21 @@ const CreatePetition = () => {
 
     const handleSubmit = async () => {
         try {
+            if (!photoInputted) {
+                throw new Error("Image must be attached");
+            }
+
             if (imageToRemove) {
                 setImageToRemove(false);
             }
 
             await axios.post(
-                API_BASE_URL + "/users/" + id,
+                API_BASE_URL + "/petitions",
                 {
-                    inputtedTitle,
-                    inputtedDescription,
-                    inputtedCategoryId,
-                    inputtedSupportTiers,
+                    title: inputtedTitle,
+                    description: inputtedDescription,
+                    categoryId: inputtedCategoryId,
+                    supportTiers: inputtedSupportTiers,
                 },
                 {
                     headers: {
@@ -132,6 +136,7 @@ const CreatePetition = () => {
             }
 
             localStorage.setItem("isLoggedIn", "true");
+            console.log("petition created");
             navigate("/" + id);
         } catch (error: any) {
             if (error.response.status === 400) {

@@ -7,6 +7,7 @@ import { defaultUser } from "../utils/defaultStates";
 import { User } from "user";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
+import MyPetitionsTable from "./MyPetitionsTable";
 
 const UserProfile = () => {
     const { id } = useParams();
@@ -69,6 +70,7 @@ const UserProfile = () => {
 
         fetchUserInformation();
         fetchUserProfileImage();
+        console.log(userAuth.authUser.userId);
         // console.log(userInformation);
         setChecked(true);
     }, []);
@@ -160,7 +162,9 @@ const UserProfile = () => {
                                 alignItems: "center",
                             }}
                         ></Grid>
-                        <Grid item xs={6} sx={{ maxWidth: 10, textAlign: "left" }}></Grid>
+                        <Grid item xs={6} sx={{ maxWidth: 10, textAlign: "left" }}>
+                            <MyPetitionsTable />
+                        </Grid>
                     </Grid>
                 </Grow>
             </Box>

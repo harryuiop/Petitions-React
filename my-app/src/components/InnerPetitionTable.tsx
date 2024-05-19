@@ -27,8 +27,6 @@ const InnerPetitionTable = ({
     sortBy: string;
     givenPetition: PetitionFromGetOne;
 }) => {
-    const [viewedPetition, setViewedPetition] =
-        useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [allPetitionsFromGetAll, setAllPetitionsFromGetAll] = useState<PetitionFromGetAll[]>([]);
