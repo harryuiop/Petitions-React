@@ -27,7 +27,7 @@ const ExplorePetition = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [id]);
 
     const fetchData = async () => {
         try {

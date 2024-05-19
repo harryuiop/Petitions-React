@@ -38,6 +38,8 @@ const MyPetitionsTable = ({ userId }: { userId: string }) => {
                 const ownedPetitions = ownedPetitionsResponse.data.petitions;
                 const supportedPetitions = supportedPetitionsResponse.data.petitions;
 
+                console.log(supportedPetitions);
+
                 const combinedPetitions = [...ownedPetitions, ...supportedPetitions];
                 setUsersPetitions(combinedPetitions);
             } catch (error: any) {
