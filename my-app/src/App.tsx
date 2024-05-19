@@ -12,6 +12,7 @@ import { userAuthDetailsContext } from "./utils/userAuthContext";
 import UserProfile from "./components/UserProfile";
 import EditProfile from "./components/EditProfile";
 import CreatePetition from "./components/CreatePetition";
+import EditPetition from "./components/EditPetition";
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -63,7 +64,7 @@ function App() {
                                 element={<CreatePetition />}
                             />
                             <Route path="petition/create" element={<CreatePetition />} />
-                            <Route path="petition/:id/edit" element={<EditProfile />} />
+                            <Route path="petition/:id/edit" element={<EditPetition />} />
                             <Route path="user/profile/:id" element={<UserProfile />} />
                             <Route path="user/profile/:id/edit" element={<EditProfile />} />
                             <Route path="/" element={<Home />} />

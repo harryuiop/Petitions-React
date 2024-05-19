@@ -1,19 +1,21 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { PetitionFromGetOne, SupporterTiersGet } from "petition";
 import { defaultPetitionFromGetOne, defaultUser, petitionCategory } from "../utils/defaultStates";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
 import NavBar from "./NavBar";
-import { Box, Grid, Grow, Typography } from "@mui/material";
+import { Box, Button, Grid, Grow, Typography } from "@mui/material";
 import { User } from "user";
 import PetitionSignersTable from "./PetitionSignersTable";
 import SupportTierExploreTable from "./SupportTierExploreTable";
 import InnerPetitionTable from "./InnerPetitionTable";
 import { formatTimestamp } from "../utils/timestampFormatting";
+import { useUserAuthDetailsContext } from "../utils/userAuthContext";
 
 const ExplorePetition = () => {
     const { id } = useParams();
+    const userAuth = useUserAuthDetailsContext();
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [petitionImage, setPetitionImage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -216,6 +218,13 @@ const ExplorePetition = () => {
                                 {petitionOwnerUserInformation.lastName}
                             </span>
                         </Typography>
+                        {petition.ownerId === userAuth.authUser.userId ? (
+                            <Button component={Link} to={"/petition/" + id + "/edit"}>
+                                Edit Petition
+                            </Button>
+                        ) : (
+                            <></>
+                        )}
                     </Grid>
                     <Grid
                         item

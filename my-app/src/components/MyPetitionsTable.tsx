@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
 import { useUserAuthDetailsContext } from "../utils/userAuthContext";
-import { PetitionFromGetAll, PetitionFromGetOne } from "petition";
+import { PetitionFromGetOne } from "petition";
 import {
     Paper,
     Table,
@@ -14,7 +14,6 @@ import {
     Typography,
 } from "@mui/material";
 import PetitionCard from "./PetitionCard";
-import { SupporterDirectQuery } from "supporter";
 
 const MyPetitionsTable = ({ userId }: { userId: string }) => {
     const userAuth = useUserAuthDetailsContext();
@@ -37,9 +36,6 @@ const MyPetitionsTable = ({ userId }: { userId: string }) => {
 
                 const ownedPetitions = ownedPetitionsResponse.data.petitions;
                 const supportedPetitions = supportedPetitionsResponse.data.petitions;
-
-                console.log(supportedPetitions);
-
                 const combinedPetitions = [...ownedPetitions, ...supportedPetitions];
                 setUsersPetitions(combinedPetitions);
             } catch (error: any) {
