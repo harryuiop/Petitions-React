@@ -8,13 +8,21 @@ import { useUserAuthDetailsContext } from "../utils/userAuthContext";
 const Home = () => {
     const userAuth = useUserAuthDetailsContext();
     const [searchInput, setSearchInput] = useState("");
-    const [loginSnackbarOpen, setLoginSnackbarOpen] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackMessage, setSnackMessage] = useState("");
 
     useEffect(() => {
         const isLoggedIn = localStorage.getItem("isLoggedIn");
+        const PetitionDeleted = localStorage.getItem("PetitionDeleted");
+
         if (isLoggedIn === "true") {
-            setLoginSnackbarOpen(true);
+            setSnackbarOpen(true);
+            setSnackMessage("Successfully logged in");
             localStorage.removeItem("isLoggedIn");
+        } else if (PetitionDeleted) {
+            setSnackbarOpen(true);
+            setSnackMessage("Petition successfully deleted");
+            localStorage.removeItem("PetitionDeleted");
         }
     }, [userAuth.authUser.userId]);
 
@@ -22,7 +30,7 @@ const Home = () => {
         if (reason === "clickaway") {
             return;
         }
-        setLoginSnackbarOpen(false);
+        setSnackbarOpen(false);
     };
 
     return (
@@ -49,7 +57,7 @@ const Home = () => {
             </Box>
 
             <Snackbar
-                open={loginSnackbarOpen}
+                open={snackbarOpen}
                 autoHideDuration={4000}
                 onClose={handleSnackbarClose}
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
@@ -59,7 +67,7 @@ const Home = () => {
                     severity="success"
                     sx={{ width: "100%", marginRight: 2, marginTop: 10 }}
                 >
-                    {"Successfully logged in"}
+                    {snackMessage}
                 </Alert>
             </Snackbar>
         </div>

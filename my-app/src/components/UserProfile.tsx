@@ -1,7 +1,7 @@
 import { useUserAuthDetailsContext } from "../utils/userAuthContext";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Box, Button, Grid, Grow, Typography } from "@mui/material";
+import { Alert, Box, Button, Grid, Grow, Snackbar, Typography } from "@mui/material";
 import NavBar from "./NavBar";
 import { defaultUser } from "../utils/defaultStates";
 import { User } from "user";
@@ -19,6 +19,8 @@ const UserProfile = () => {
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [checked, setChecked] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackMessage, setSnackMessage] = useState("");
 
     if (
         userAuth.authUser.userId === -1 ||
@@ -29,6 +31,13 @@ const UserProfile = () => {
 
     useEffect(() => {
         setUserId(userAuth.authUser.userId);
+
+        const ProfileEdited = localStorage.getItem("DetailsUpdated");
+        if (ProfileEdited === "true") {
+            setSnackbarOpen(true);
+            setSnackMessage("Details Successfully updated");
+            localStorage.removeItem("DetailsUpdated");
+        }
 
         const fetchUserInformation = async () => {
             await axios
@@ -72,6 +81,13 @@ const UserProfile = () => {
         fetchUserProfileImage();
         setChecked(true);
     }, []);
+
+    const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setSnackbarOpen(false);
+    };
 
     return (
         <>
@@ -161,11 +177,28 @@ const UserProfile = () => {
                             }}
                         ></Grid>
                         <Grid item xs={6} sx={{ maxWidth: 10, textAlign: "left" }}>
-                            <MyPetitionsTable userId={id as string} />
+                            <Box maxWidth={900}>
+                                <MyPetitionsTable userId={id as string} />
+                            </Box>
                         </Grid>
                     </Grid>
                 </Grow>
             </Box>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={4000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity="success"
+                    sx={{ width: "100%", marginRight: 2, marginTop: 10 }}
+                >
+                    {snackMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

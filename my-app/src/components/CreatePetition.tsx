@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useUserAuthDetailsContext } from "../utils/userAuthContext";
 import {
+    Alert,
     Box,
     Button,
     Dialog,
@@ -9,11 +10,13 @@ import {
     DialogContentText,
     DialogTitle,
     FormControl,
+    Grid,
     InputLabel,
     MenuItem,
     Paper,
     Select,
     SelectChangeEvent,
+    Snackbar,
     Table,
     TableBody,
     TableCell,
@@ -98,7 +101,17 @@ const CreatePetition = () => {
     const handleSubmit = async () => {
         try {
             if (!photoInputted) {
-                throw new Error("Image must be attached");
+                throw new Error("Image must be included");
+            }
+
+            if (!inputtedTitle || !inputtedDescription || !inputtedCategoryId) {
+                setErrorMessage("Please fill out all fields");
+                throw new Error("Please fill out all fields");
+            }
+
+            if (inputtedSupportTiers.length < 1) {
+                setErrorMessage("Please add a support tier");
+                throw new Error("Please add a support tier");
             }
 
             if (imageToRemove) {
@@ -120,32 +133,24 @@ const CreatePetition = () => {
                 },
             );
 
-            // get petition id and add below
+            // if (inputtedPetitionPhoto !== "") {
+            //     await axios.post(
+            //         API_BASE_URL + "/petition/" + id + "/image",
+            //         { inputtedPetitionPhoto },
+            //         {
+            //             headers: {
+            //                 "X-Authorization": userAuth.authUser.token,
+            //                 "Content-Type": fileType,
+            //             },
+            //         },
+            //     );
+            // }
 
-            if (inputtedPetitionPhoto !== "") {
-                await axios.post(
-                    API_BASE_URL + "/petition/" + id + "/image",
-                    { inputtedPetitionPhoto },
-                    {
-                        headers: {
-                            "X-Authorization": userAuth.authUser.token,
-                            "Content-Type": fileType,
-                        },
-                    },
-                );
-            }
-
-            // ToDo: ??? below
-            localStorage.setItem("isLoggedIn", "true");
-            navigate("/" + id);
+            navigate("/");
         } catch (error: any) {
-            if (error.response.status === 400) {
-                setErrorMessage("Invalid information");
-                setSnackbarFailOpen(true);
-            } else {
-                setErrorMessage(error.response.message);
-                setSnackbarFailOpen(true);
-            }
+            setErrorMessage("Invalid information");
+            setErrorMessage(error.message);
+            setSnackbarFailOpen(true);
         }
     };
 
@@ -172,228 +177,270 @@ const CreatePetition = () => {
 
     return (
         <>
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    minHeight: "70vh",
-                }}
+            <Snackbar
+                open={snackbarFailOpen}
+                autoHideDuration={6000}
+                onClose={() => setSnackbarFailOpen(false)}
+                message={errorMessage}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
             >
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        maxWidth: 500,
-                        padding: 3,
-                        minWidth: 100,
-                    }}
+                <Alert
+                    onClose={() => setSnackbarFailOpen(false)}
+                    severity="error"
+                    sx={{ width: "100%" }}
                 >
-                    <Typography
-                        variant="h3"
-                        color={grey[200]}
-                        sx={{ paddingTop: 3, paddingBottom: 4, marginRight: 2 }}
-                    >
-                        Create Petition
-                    </Typography>
-
-                    <TextField
-                        id="title"
-                        label="Title"
-                        variant="outlined"
-                        value={inputtedTitle}
-                        onChange={(event) => {
-                            setInputtedTitle(event.target.value);
+                    {errorMessage}
+                </Alert>
+            </Snackbar>
+            <Typography
+                variant="h3"
+                color={grey[200]}
+                sx={{ paddingTop: 10, paddingBottom: 10, marginRight: 2 }}
+            >
+                Create Petition
+            </Typography>
+            <Grid container spacing={2}>
+                <Grid
+                    item
+                    xs={6}
+                    display="flex"
+                    alignItems="flex-end"
+                    flexDirection="column"
+                    sx={{ paddingRight: 5 }}
+                >
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            minHeight: "70vh",
+                            minWidth: 400,
                         }}
-                        sx={{ marginBottom: 2 }}
-                    />
-                    <TextField
-                        id="description"
-                        label="Description"
-                        variant="outlined"
-                        value={inputtedDescription}
-                        onChange={(event) => {
-                            setInputtedDescription(event.target.value);
-                        }}
-                        sx={{ marginBottom: 2 }}
-                    />
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Category</InputLabel>
-                        <Select
-                            labelId="category-id"
-                            id="category-id"
-                            value={inputtedCategoryId}
-                            label="Category"
-                            onChange={handleCategorySelection}
-                        >
-                            {allCategory.map((category: CategoryRequest) => (
-                                <MenuItem key={category.categoryId} value={category.categoryId}>
-                                    {category.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    {inputtedSupportTiers.length < 3 ? (
-                        <Button variant="outlined" onClick={handleOpenModal}>
-                            Add Support Tier
-                        </Button>
-                    ) : (
-                        <></>
-                    )}
-                    <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 200 }} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Title</TableCell>
-                                    <TableCell>Description</TableCell>
-                                    <TableCell>Cost</TableCell>
-                                    <TableCell></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {inputtedSupportTiers.map((supportTier) => (
-                                    <TableRow>
-                                        <TableCell>{supportTier.title}</TableCell>
-                                        <TableCell>{supportTier.description}</TableCell>
-                                        <TableCell>{supportTier.cost}</TableCell>
-                                        <TableCell>
-                                            <Button
-                                                onClick={() =>
-                                                    handleDeleteSupportTier(supportTier.title)
-                                                }
-                                            >
-                                                Delete
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Dialog
-                        open={openSupporterTierModal}
-                        onClose={handleCloseModal}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
                     >
-                        <DialogTitle id="alert-dialog-title">{"Add Support Tier"}</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                                Please give us information on you petition's support tiers
-                            </DialogContentText>
+                        <Typography variant={"h6"} sx={{ color: "white" }}>
+                            Details
+                        </Typography>
+                        <FormControl fullWidth sx={{ marginBottom: 2 }}>
                             <TextField
-                                id="support-tier-title"
-                                label="Support Tier Tittle"
+                                id="title"
+                                label="Title"
                                 variant="outlined"
-                                value={inputtedSupportTierTitle}
+                                value={inputtedTitle}
                                 onChange={(event) => {
-                                    setInputtedSupportTierTitle(event.target.value);
-                                }}
-                                sx={{ marginBottom: 2, marginTop: 2 }}
-                            />
-                            <TextField
-                                id="support-tier-desc"
-                                label="Support Tier Description"
-                                variant="outlined"
-                                value={inputtedSupportTierDescription}
-                                onChange={(event) => {
-                                    setInputtedSupportTierDescription(event.target.value);
-                                }}
-                                sx={{ marginBottom: 2 }}
-                            />
-                            <TextField
-                                id="support-tier-cost"
-                                label="Support Tier Cost"
-                                variant="outlined"
-                                value={inputtedSupportTierCost}
-                                onChange={(event) => {
-                                    setInputtedSupportTierCost(event.target.value);
-                                }}
-                                onKeyDown={(event) => {
-                                    if (
-                                        !/[0-9]/.test(event.key) &&
-                                        !(event.key === "Backspace" || event.key === "Delete")
-                                    ) {
-                                        event.preventDefault();
-                                    }
-                                }}
-                                InputProps={{
-                                    inputProps: {
-                                        min: 0,
-                                    },
+                                    setInputtedTitle(event.target.value);
                                 }}
                             />
-                        </DialogContent>
-                        <DialogActions>
-                            <Button
-                                onClick={() => {
-                                    setInputtedSupportTierTitle("");
-                                    setInputtedSupportTierDescription("");
-                                    setInputtedSupportTierCost("");
-                                    handleCloseModal();
+                        </FormControl>
+                        <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                            <TextField
+                                id="description"
+                                label="Description"
+                                variant="outlined"
+                                value={inputtedDescription}
+                                onChange={(event) => {
+                                    setInputtedDescription(event.target.value);
                                 }}
+                                multiline
+                                rows={4}
+                            />
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                            <Select
+                                labelId="category-id"
+                                id="category-id"
+                                value={inputtedCategoryId}
+                                label="Category"
+                                onChange={handleCategorySelection}
                             >
-                                Cancel
+                                {allCategory.map((category: CategoryRequest) => (
+                                    <MenuItem key={category.categoryId} value={category.categoryId}>
+                                        {category.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        {inputtedPetitionPhoto === "" ? (
+                            <Button variant="outlined" component="label" sx={{ marginTop: 2 }}>
+                                UPLOAD PROFILE IMAGE
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    hidden
+                                />
                             </Button>
+                        ) : (
+                            <>
+                                <Button
+                                    variant="outlined"
+                                    onClick={handleRemoveImage}
+                                    sx={{ marginTop: 2, marginBottom: 1 }}
+                                >
+                                    REMOVE PETITION IMAGE
+                                </Button>
+                                <Typography
+                                    variant="body2"
+                                    sx={{ color: green[400], marginTop: 0, paddingBottom: 2 }}
+                                >
+                                    Image uploaded successfully!
+                                </Typography>
+                            </>
+                        )}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                marginBottom: 3,
+                                marginTop: 3,
+                            }}
+                        >
                             <Button
                                 variant="outlined"
                                 color="success"
-                                onClick={handleAddToInputtedSupportTiers}
-                                autoFocus
+                                onClick={handleSubmit}
+                                sx={{ marginRight: 2 }}
                             >
-                                Confirm
+                                Create
                             </Button>
-                        </DialogActions>
-                    </Dialog>
-
-                    <Button component="span" sx={{ marginBottom: 1 }} onClick={handleRemoveImage}>
-                        Remove petition image
-                    </Button>
-                    <input
-                        accept="image/*"
-                        className="imageInput"
-                        style={{ display: "none" }}
-                        id="raised-button-file"
-                        type="file"
-                        onChange={handleImageChange}
-                    />
-
-                    {/* ToDo: Finish the photo implementation */}
-                    <label htmlFor="raised-button-file">
-                        <Button component="span" className="imageInput" sx={{ marginBottom: 2 }}>
-                            {!photoInputted ? "Upload profile image" : "Change uploaded image"}
-                        </Button>
-                    </label>
-                    {photoInputted && (
-                        <Typography
-                            variant="body2"
-                            sx={{ color: green[400], marginTop: 0, paddingBottom: 2 }}
-                        >
-                            Image uploaded successfully!
+                            <Button component={Link} to={"/"} variant="outlined" color="error">
+                                Cancel
+                            </Button>
+                        </Box>
+                    </Box>
+                </Grid>
+                <Grid item display="flex" flexDirection="column" xs={6}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            minHeight: "70vh",
+                            maxWidth: 500,
+                        }}
+                    >
+                        <Typography variant={"h6"} sx={{ color: "white" }}>
+                            Support Tiers
                         </Typography>
-                    )}
-                    <Button variant="outlined" color="success" onClick={handleSubmit}>
-                        Create
-                    </Button>
-                    <Button
-                        component={Link}
-                        to={"/"}
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Title</TableCell>
+                                        <TableCell>Description</TableCell>
+                                        <TableCell>Cost</TableCell>
+                                        <TableCell></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {inputtedSupportTiers.map((supportTier) => (
+                                        <TableRow key={supportTier.title}>
+                                            <TableCell>{supportTier.title}</TableCell>
+                                            <TableCell>{supportTier.description}</TableCell>
+                                            <TableCell>{supportTier.cost}</TableCell>
+                                            <TableCell>
+                                                <Button
+                                                    onClick={() =>
+                                                        handleDeleteSupportTier(supportTier.title)
+                                                    }
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        {inputtedSupportTiers.length < 3 && (
+                            <Button
+                                variant="outlined"
+                                onClick={handleOpenModal}
+                                sx={{ marginTop: 2 }}
+                            >
+                                ADD SUPPORT TIER
+                            </Button>
+                        )}
+                    </Box>
+                </Grid>
+            </Grid>
+
+            <Dialog
+                open={openSupporterTierModal}
+                onClose={handleCloseModal}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Add Support Tier"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Please give us information on you petition's support tiers
+                    </DialogContentText>
+                    <TextField
+                        id="support-tier-title"
+                        label="Support Tier Tittle"
                         variant="outlined"
-                        color="error"
-                        sx={{ marginTop: 1 }}
+                        value={inputtedSupportTierTitle}
+                        onChange={(event) => {
+                            setInputtedSupportTierTitle(event.target.value);
+                        }}
+                        sx={{ marginBottom: 2, marginTop: 2 }}
+                    />
+                    <TextField
+                        id="support-tier-desc"
+                        label="Support Tier Description"
+                        variant="outlined"
+                        value={inputtedSupportTierDescription}
+                        onChange={(event) => {
+                            setInputtedSupportTierDescription(event.target.value);
+                        }}
+                        sx={{ marginBottom: 2 }}
+                    />
+                    <TextField
+                        id="support-tier-cost"
+                        label="Support Tier Cost"
+                        variant="outlined"
+                        value={inputtedSupportTierCost}
+                        onChange={(event) => {
+                            setInputtedSupportTierCost(event.target.value);
+                        }}
+                        onKeyDown={(event) => {
+                            if (
+                                !/[0-9]/.test(event.key) &&
+                                !(event.key === "Backspace" || event.key === "Delete")
+                            ) {
+                                event.preventDefault();
+                            }
+                        }}
+                        InputProps={{
+                            inputProps: {
+                                min: 0,
+                            },
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => {
+                            setInputtedSupportTierTitle("");
+                            setInputtedSupportTierDescription("");
+                            setInputtedSupportTierCost("");
+                            handleCloseModal();
+                        }}
                     >
                         Cancel
                     </Button>
-                    <input
-                        accept="image/*"
-                        className={"imageInput"}
-                        style={{ display: "none" }}
-                        id="raised-button-file"
-                        multiple
-                        type="file"
-                    />
-                </Box>
-            </Box>
+                    <Button
+                        variant="outlined"
+                        color="success"
+                        onClick={handleAddToInputtedSupportTiers}
+                        autoFocus
+                    >
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

@@ -13,8 +13,13 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    FormControl,
     Grid,
     Grow,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
     Typography,
 } from "@mui/material";
 import { User } from "user";
@@ -34,14 +39,17 @@ const ExplorePetition = () => {
     const [petitionOwnerUserInformation, setPetitionOwnerUserInformation] =
         useState<User>(defaultUser);
     const [petitionOwnerUserImage, setPetitionOwnerUserImage] = useState("");
-    const [openModal, setOpenModal] = useState(false);
+    const [openModal, setOpenDeleteModal] = useState(false);
     const [minSupportTierCost, setMinSupportTierCost] = useState(0);
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [checked, setChecked] = useState(false);
+    const [openSupportPetitionModal, setOpenSupportPetitionModal] = React.useState(false);
+    const [inputtedSupportMessage, setInputtedSupportMessage] = useState("");
+    const [inputtedSupportTierId, setInputtedSupportTierId] = useState("");
 
-    const handleOpenModal = () => setOpenModal(true);
-    const handleCloseModal = () => setOpenModal(false);
+    const handleOpenDeleteModal = () => setOpenDeleteModal(true);
+    const handleCloseDeleteModal = () => setOpenDeleteModal(false);
 
     useEffect(() => {
         fetchData();
@@ -113,7 +121,30 @@ const ExplorePetition = () => {
                     "X-Authorization": userAuth.authUser.token,
                 },
             });
+            localStorage.setItem("PetitionDeleted", "true");
             navigate("/");
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const handleSupportConfirm = async () => {
+        try {
+            const response = await axios.post(
+                API_BASE_URL + "/petitions/" + id + "/supporters",
+                {
+                    supportTierId: inputtedSupportTierId,
+                    message: inputtedSupportMessage,
+                },
+                {
+                    headers: {
+                        "X-Authorization": userAuth.authUser.token,
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+            setOpenSupportPetitionModal(false);
         } catch (error: any) {
             setErrorFlag(true);
             setErrorMessage(error.toString());
@@ -272,13 +303,20 @@ const ExplorePetition = () => {
                                     >
                                         Edit Petition
                                     </Button>
-                                    <Button onClick={handleOpenModal} sx={{ marginTop: 1 }}>
+                                    <Button onClick={handleOpenDeleteModal} sx={{ marginTop: 1 }}>
                                         Delete Petition
                                     </Button>
                                 </Box>
                             </>
                         ) : (
-                            <></>
+                            <Button
+                                onClick={() => {
+                                    setOpenSupportPetitionModal(true);
+                                }}
+                                sx={{ marginTop: 2 }}
+                            >
+                                Support this petition
+                            </Button>
                         )}
                     </Grid>
                     <Grid
@@ -341,7 +379,7 @@ const ExplorePetition = () => {
             </Grow>
             <Dialog
                 open={openModal}
-                onClose={handleCloseModal}
+                onClose={handleCloseDeleteModal}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -354,7 +392,7 @@ const ExplorePetition = () => {
                 <DialogActions>
                     <Button
                         onClick={() => {
-                            handleCloseModal();
+                            handleCloseDeleteModal();
                         }}
                     >
                         Cancel
@@ -363,6 +401,70 @@ const ExplorePetition = () => {
                         variant="outlined"
                         color="error"
                         onClick={handleDeletePetition}
+                        autoFocus
+                    >
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openSupportPetitionModal}
+                onClose={handleCloseDeleteModal}
+                fullWidth={true}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Support this petition"}</DialogTitle>
+                <DialogContent>
+                    <Box>
+                        <DialogContentText id="alert-dialog-description" sx={{ marginBottom: 1 }}>
+                            Choose a support tier
+                        </DialogContentText>
+                        <FormControl sx={{ minWidth: 250 }}>
+                            <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                            <Select
+                                labelId="category-id"
+                                id="category-id"
+                                value={inputtedSupportTierId}
+                                label="Category"
+                                onChange={(event) => {
+                                    setInputtedSupportTierId(event.target.value);
+                                }}
+                            >
+                                {petition.supportTiers.map((tier) => (
+                                    <MenuItem key={tier.title} value={tier.supportTierId}>
+                                        {tier.title}
+                                        {": $" + tier.cost}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            id="support-tier-desc"
+                            label="Optional Message"
+                            variant="outlined"
+                            value={inputtedSupportMessage}
+                            onChange={(event) => {
+                                setInputtedSupportMessage(event.target.value);
+                            }}
+                            sx={{ marginBottom: 2, minWidth: 250, marginLeft: 1 }}
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => {
+                            setOpenSupportPetitionModal(false);
+                            setInputtedSupportTierId("");
+                            setInputtedSupportMessage("");
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="success"
+                        onClick={handleSupportConfirm}
                         autoFocus
                     >
                         Confirm

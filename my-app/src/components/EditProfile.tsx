@@ -147,7 +147,7 @@ const EditProfile = () => {
             setInputtedPassword("");
             setInputtedPassword("");
             setSnackbarSuccessOpen(true);
-            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("DetailsUpdated", "true");
             navigate("/user/profile/" + id);
         } catch (error: any) {
             if (error.response.status === 400) {

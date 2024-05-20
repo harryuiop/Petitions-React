@@ -31,7 +31,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import { green, grey } from "@mui/material/colors";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
 import { defaultPetitionFromGetOne } from "../utils/defaultStates";
@@ -263,7 +263,7 @@ const EditPetition = () => {
                     <Typography
                         variant="h3"
                         color={grey[200]}
-                        sx={{ paddingTop: 3, paddingBottom: 4, marginRight: 2 }}
+                        sx={{ paddingTop: 10, marginBottom: 10, marginRight: 2 }}
                     >
                         Edit Petition
                     </Typography>
@@ -353,6 +353,14 @@ const EditPetition = () => {
                                     >
                                         REMOVE PETITION IMAGE
                                     </Button>
+                                )}
+                                {photoInputted && (
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ color: green[400], marginTop: 0, paddingBottom: 2 }}
+                                    >
+                                        Image uploaded successfully!
+                                    </Typography>
                                 )}
                                 <Box
                                     sx={{

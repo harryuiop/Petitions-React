@@ -5,3 +5,7 @@ Things to Fix:
 4. Add profile display to register
 5. Fix image uploads
 6. Implement snack bar on edit
+7. Snackbar for petition edited and adding a support tier in edit
+9. Numbers in petition cost
+10. update explore petition when new supporter
+11. add snackbar for confirming a petition is singed
