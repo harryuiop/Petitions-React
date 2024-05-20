@@ -1,11 +1,22 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { PetitionFromGetOne, SupporterTiersGet } from "petition";
 import { defaultPetitionFromGetOne, defaultUser, petitionCategory } from "../utils/defaultStates";
 import axios from "axios";
 import { API_BASE_URL } from "../config";
 import NavBar from "./NavBar";
-import { Box, Button, Grid, Grow, Typography } from "@mui/material";
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Grid,
+    Grow,
+    Typography,
+} from "@mui/material";
 import { User } from "user";
 import PetitionSignersTable from "./PetitionSignersTable";
 import SupportTierExploreTable from "./SupportTierExploreTable";
@@ -15,6 +26,7 @@ import { useUserAuthDetailsContext } from "../utils/userAuthContext";
 
 const ExplorePetition = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const userAuth = useUserAuthDetailsContext();
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
     const [petitionImage, setPetitionImage] = useState("");
@@ -22,10 +34,14 @@ const ExplorePetition = () => {
     const [petitionOwnerUserInformation, setPetitionOwnerUserInformation] =
         useState<User>(defaultUser);
     const [petitionOwnerUserImage, setPetitionOwnerUserImage] = useState("");
+    const [openModal, setOpenModal] = useState(false);
     const [minSupportTierCost, setMinSupportTierCost] = useState(0);
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [checked, setChecked] = useState(false);
+
+    const handleOpenModal = () => setOpenModal(true);
+    const handleCloseModal = () => setOpenModal(false);
 
     useEffect(() => {
         fetchData();
@@ -84,6 +100,20 @@ const ExplorePetition = () => {
             setErrorMessage("");
             const url = URL.createObjectURL(response.data);
             setPetitionOwnerUserImage(url);
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const handleDeletePetition = () => {
+        try {
+            const response = axios.delete(API_BASE_URL + "/petitions/" + id, {
+                headers: {
+                    "X-Authorization": userAuth.authUser.token,
+                },
+            });
+            navigate("/");
         } catch (error: any) {
             setErrorFlag(true);
             setErrorMessage(error.toString());
@@ -172,7 +202,15 @@ const ExplorePetition = () => {
                             {petition.numberOfSupporters}
                         </Typography>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid
+                        item
+                        xs={4}
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                        }}
+                    >
                         <Typography variant={"subtitle1"} sx={{ color: "white", fontSize: 15 }}>
                             Owned By:
                         </Typography>
@@ -219,9 +257,26 @@ const ExplorePetition = () => {
                             </span>
                         </Typography>
                         {petition.ownerId === userAuth.authUser.userId ? (
-                            <Button component={Link} to={"/petition/" + id + "/edit"}>
-                                Edit Petition
-                            </Button>
+                            <>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        maxWidth: 300,
+                                    }}
+                                >
+                                    <Button
+                                        component={Link}
+                                        to={"/petition/" + id + "/edit"}
+                                        sx={{ marginTop: 3 }}
+                                    >
+                                        Edit Petition
+                                    </Button>
+                                    <Button onClick={handleOpenModal} sx={{ marginTop: 1 }}>
+                                        Delete Petition
+                                    </Button>
+                                </Box>
+                            </>
                         ) : (
                             <></>
                         )}
@@ -284,6 +339,36 @@ const ExplorePetition = () => {
                     </Grid>
                 </Grid>
             </Grow>
+            <Dialog
+                open={openModal}
+                onClose={handleCloseModal}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Delete Petition"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete your petition?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => {
+                            handleCloseModal();
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={handleDeletePetition}
+                        autoFocus
+                    >
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };
