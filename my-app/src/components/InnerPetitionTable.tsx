@@ -1,4 +1,5 @@
 import {
+    Box,
     Paper,
     Table,
     TableBody,
@@ -13,6 +14,11 @@ import { API_BASE_URL } from "../config";
 import { PetitionFromGetAll, PetitionFromGetOne } from "petition";
 import PetitionCard from "./PetitionCard";
 import { defaultPetitionFromGetOne, petitionCategory } from "../utils/defaultStates";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import FirstPageIcon from "@mui/icons-material/FirstPage";
+import LastPageIcon from "@mui/icons-material/LastPage";
+import IconButton from "@mui/material/IconButton";
 
 const InnerPetitionTable = ({
     searchInput,
@@ -28,7 +34,7 @@ const InnerPetitionTable = ({
     givenPetition: PetitionFromGetOne;
 }) => {
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [allPetitionsFromGetAll, setAllPetitionsFromGetAll] = useState<PetitionFromGetAll[]>([]);
     const [allPetitionsFromGetOne, setAllPetitionsFromGetOne] = useState<PetitionFromGetOne[]>([]);
     const [allFilteredPetitions, setAllFilteredPetitions] = useState<PetitionFromGetOne[]>([]);
@@ -124,12 +130,32 @@ const InnerPetitionTable = ({
         setAllFilteredPetitions(filteredPetitions);
     }, [searchInput, selectedOptions, maxSupporterCost, allPetitionsFromGetOne, givenPetition]);
 
-    const handleChangePage = (event: any, newPage: React.SetStateAction<number>) =>
+    const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
         setPage(newPage);
+    };
 
     const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
+    };
+
+    const handleFirstPageButtonClick = (event: any) => {
+        handleChangePage(event, 0);
+    };
+
+    const handleBackButtonClick = (event: any) => {
+        handleChangePage(event, page - 1);
+    };
+
+    const handleNextButtonClick = (event: any) => {
+        handleChangePage(event, page + 1);
+    };
+
+    const handleLastPageButtonClick = (event: any) => {
+        handleChangePage(
+            event,
+            Math.max(0, Math.ceil(allFilteredPetitions.length / rowsPerPage) - 1),
+        );
     };
 
     return (
@@ -165,7 +191,7 @@ const InnerPetitionTable = ({
                 </Table>
             </TableContainer>
             <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={[10, 25]}
                 component="div"
                 count={allFilteredPetitions.length}
                 rowsPerPage={rowsPerPage}
@@ -177,6 +203,42 @@ const InnerPetitionTable = ({
                     display: "flex",
                     justifyContent: "flex-start",
                 }}
+                ActionsComponent={() => (
+                    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+                        <IconButton
+                            onClick={handleFirstPageButtonClick}
+                            disabled={page === 0}
+                            aria-label="first page"
+                        >
+                            <FirstPageIcon />
+                        </IconButton>
+                        <IconButton
+                            onClick={handleBackButtonClick}
+                            disabled={page === 0}
+                            aria-label="previous page"
+                        >
+                            <KeyboardArrowLeft />
+                        </IconButton>
+                        <IconButton
+                            onClick={handleNextButtonClick}
+                            disabled={
+                                page >= Math.ceil(allFilteredPetitions.length / rowsPerPage) - 1
+                            }
+                            aria-label="next page"
+                        >
+                            <KeyboardArrowRight />
+                        </IconButton>
+                        <IconButton
+                            onClick={handleLastPageButtonClick}
+                            disabled={
+                                page >= Math.ceil(allFilteredPetitions.length / rowsPerPage) - 1
+                            }
+                            aria-label="last page"
+                        >
+                            <LastPageIcon />
+                        </IconButton>
+                    </Box>
+                )}
             />
         </Paper>
     );
