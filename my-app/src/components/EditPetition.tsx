@@ -101,7 +101,7 @@ const EditPetition = () => {
                     ...(inputtedTitle !== "" && { title: inputtedTitle }),
                     ...(inputtedDescription !== "" && { description: inputtedDescription }),
                     ...(inputtedCategoryId !== "" && { categoryId: inputtedCategoryId }),
-                };
+                }
 
                 const response = await axios.patch(API_BASE_URL + "/petitions/" + id, requestBody, {
                     headers: {

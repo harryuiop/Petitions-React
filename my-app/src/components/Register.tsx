@@ -14,17 +14,19 @@ const Register = () => {
     const [snackbarSuccessOpen, setSnackbarSuccessOpen] = useState(false);
     const [snackbarFailOpen, setSnackbarFailOpen] = useState(false);
 
-    const [inputtedProfilePhoto, setInputtedProfilePhoto] = useState("");
+    const [inputtedProfilePhoto, setInputtedProfilePhoto] = useState<Uint8Array>(new Uint8Array());
     const [inputtedEmail, setInputtedEmail] = useState("");
     const [inputtedPassword, setInputtedPassword] = useState("");
     const [inputtedFirstName, setInputtedFirstName] = useState("");
     const [inputtedLastName, setInputtedLastName] = useState("");
+    const [fileType, setFileType] = useState("");
 
     const [photoInputted, setPhotoInputted] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [passwordVisibility, setPasswordVisibility] = useState(true);
+    const [errorFlag, setErrorFlag] = useState(false);
 
     const userAuth = useUserAuthDetailsContext();
 
@@ -35,8 +37,9 @@ const Register = () => {
     const handleImageChange = (event: any) => {
         const file = event.target.files[0];
         if (file) {
-            setInputtedProfilePhoto(file);
+            setFileType(file.type);
             setPhotoInputted(true);
+            setInputtedProfilePhoto(file);
         }
     };
 
@@ -70,15 +73,15 @@ const Register = () => {
                 },
                 { responseType: "json" },
             );
-
-            // ToDo: Make the user auto sign in and go to home page
             setInputtedLastName("");
             setInputtedFirstName("");
             setInputtedEmail("");
             setInputtedPassword("");
+            await logInUser();
+            await sendProfilePhoto(response.data.userId);
             setSnackbarSuccessOpen(true);
             localStorage.setItem("isLoggedIn", "true");
-            navigate("/SignIn");
+            navigate("/");
         } catch (error: any) {
             if (error.response.status === 400) {
                 setErrorMessage("Invalid information");
@@ -95,6 +98,50 @@ const Register = () => {
             setInputtedFirstName("");
             setInputtedEmail("");
             setInputtedPassword("");
+        }
+    };
+
+    const sendProfilePhoto = async (userId: string) => {
+        try {
+            const result = await axios.put(
+                API_BASE_URL + "/users/" + userId + "/image",
+                { inputtedProfilePhoto },
+                {
+                    headers: {
+                        "X-Authorization": localStorage.getItem("token"),
+                        "Content-Type": fileType,
+                    },
+                },
+            );
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
+
+    const logInUser = async () => {
+        try {
+            const response = await axios.post(
+                API_BASE_URL + "/users/login",
+                {
+                    email: inputtedEmail,
+                    password: inputtedPassword,
+                },
+                { responseType: "json" },
+            );
+            if (response.data.userId !== -1) {
+                localStorage.setItem("userId", response.data.userId.toString());
+                localStorage.setItem("token", response.data.token);
+                userAuth.handleLogin({
+                    userId: response.data.userId,
+                    token: response.data.token,
+                    loggedIn: true,
+                });
+                localStorage.setItem("isLoggedIn", "true");
+            }
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
         }
     };
 

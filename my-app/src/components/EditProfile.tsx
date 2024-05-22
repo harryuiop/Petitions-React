@@ -25,14 +25,16 @@ const EditProfile = () => {
     const userAuth = useUserAuthDetailsContext();
     const [userId, setUserId] = useState(-1);
     const [userInformation, setUserInformation] = useState<User>(defaultUser);
-    const [userProfilePhoto, setUserProfilePhoto] = useState("");
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [checked, setChecked] = useState(false);
     const [snackbarSuccessOpen, setSnackbarSuccessOpen] = useState(false);
     const [snackbarFailOpen, setSnackbarFailOpen] = useState(false);
 
-    const [inputtedProfilePhoto, setInputtedProfilePhoto] = useState("");
+    const [inputtedUserProfilePhoto, setInputtedUserProfilePhoto] = useState<Blob>(new Blob());
+    const [fetchedUserProfilePhoto, setFetchedUserProfilePhoto] = useState("");
+    // const [fetchedUserProfilePhoto, setFetchedUserProfilePhoto] = useState<File | null>(null);
+    const [hasInputtedPhoto, setHasInputtedPhoto] = useState(false);
     const [fileType, setFileType] = useState("");
     const [inputtedEmail, setInputtedEmail] = useState("");
     const [inputtedCurrentPassword, setInputtedCurrentPassword] = useState("");
@@ -40,7 +42,6 @@ const EditProfile = () => {
     const [inputtedFirstName, setInputtedFirstName] = useState("");
     const [inputtedLastName, setInputtedLastName] = useState("");
 
-    const [photoInputted, setPhotoInputted] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [passwordVisibility, setPasswordVisibility] = useState(true);
@@ -57,43 +58,39 @@ const EditProfile = () => {
         setUserId(userAuth.authUser.userId);
 
         const fetchUserInformation = async () => {
-            await axios
-                .get(API_BASE_URL + "/users/" + id, {
-                    headers: {
-                        "X-Authorization": userAuth.authUser.token,
-                    },
-                })
-                .then(
-                    (response) => {
-                        setErrorFlag(false);
-                        setErrorMessage("");
-                        setUserInformation(response.data);
-                    },
-                    (error) => {
-                        setErrorFlag(true);
-                        setErrorMessage(error.toString());
-                    },
-                );
-        };
-
-        // blob:http://localhost:3000/ac001828-f570-4706-9021-3ea3b2c239a5
-
-        const fetchUserProfileImage = async () => {
             try {
-                const response = await axios.get(API_BASE_URL + "/users/" + id + "/image", {
+                const response = await axios.get(API_BASE_URL + "/users/" + id, {
                     headers: {
                         "X-Authorization": userAuth.authUser.token,
                     },
-                    responseType: "blob",
                 });
                 setErrorFlag(false);
                 setErrorMessage("");
-                const url = URL.createObjectURL(response.data);
-                setUserProfilePhoto(url);
-                setPhotoInputted(true);
+                setUserInformation(response.data);
             } catch (error: any) {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());
+            }
+        };
+
+        const fetchUserProfileImage = async () => {
+            try {
+                const response = await axios.get(
+                    API_BASE_URL + "/users/" + userAuth.authUser.userId + "/image",
+                    {
+                        headers: {
+                            "X-Authorization": userAuth.authUser.token,
+                        },
+                        responseType: "blob",
+                    },
+                );
+                const imageUrl = URL.createObjectURL(response.data);
+                setFetchedUserProfilePhoto(imageUrl);
+                setHasInputtedPhoto(true);
+            } catch (error: any) {
+                console.error(error.message);
+                setErrorFlag(true);
+                setErrorMessage(error.message);
             }
         };
 
@@ -105,7 +102,7 @@ const EditProfile = () => {
     const handleSubmit = async () => {
         try {
             if (inputtedPassword !== inputtedCurrentPassword) {
-                // do something
+                throw new Error("Invalid information");
             }
 
             if (imageToRemove) {
@@ -127,19 +124,6 @@ const EditProfile = () => {
                     "X-Authorization": userAuth.authUser.token,
                 },
             });
-
-            if (inputtedProfilePhoto !== "") {
-                await axios.put(
-                    API_BASE_URL + "/users/" + id + "/image",
-                    { inputtedProfilePhoto },
-                    {
-                        headers: {
-                            "X-Authorization": userAuth.authUser.token,
-                            "Content-Type": fileType,
-                        },
-                    },
-                );
-            }
 
             setInputtedLastName("");
             setInputtedFirstName("");
@@ -174,13 +158,37 @@ const EditProfile = () => {
 
     const handleImageChange = (event: any) => {
         const file = event.target.files[0];
-        setFileType(file.type);
-        if (file) {
-            setInputtedProfilePhoto(file);
-            setPhotoInputted(true);
-            const imageUrl = URL.createObjectURL(file);
-            setUserProfilePhoto(imageUrl);
+        if (!file) {
+            return;
         }
+
+        setFileType(file.type);
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            try {
+                const arrayBuffer = reader.result as ArrayBuffer;
+                const uint8Array = new Uint8Array(arrayBuffer);
+
+                await axios.put(
+                    API_BASE_URL + "/users/" + userAuth.authUser.userId + "/image",
+                    uint8Array,
+                    {
+                        headers: {
+                            "X-Authorization": userAuth.authUser.token,
+                            "Content-Type": file.type,
+                        },
+                    },
+                );
+                setHasInputtedPhoto(true);
+                setFetchedUserProfilePhoto(file);
+            } catch (error: any) {
+                console.error(error.message);
+                setErrorFlag(true);
+                setErrorMessage(error.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
     };
 
     const validateEmailInput = () => {
@@ -209,8 +217,8 @@ const EditProfile = () => {
                 },
             });
         } catch (error: any) {
-            setInputtedProfilePhoto("");
-            setPhotoInputted(false);
+            // setInputtedProfilePhoto("");
+            setHasInputtedPhoto(false);
             if (error.response.status === 401) {
                 setErrorMessage("Unauthorized");
                 setSnackbarFailOpen(true);
@@ -227,8 +235,8 @@ const EditProfile = () => {
 
     const handleRemoveImage = async () => {
         setImageToRemove(true);
-        setPhotoInputted(false);
-        setInputtedProfilePhoto("");
+        setHasInputtedPhoto(false);
+        // setInputtedProfilePhoto("");
     };
 
     const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -276,13 +284,13 @@ const EditProfile = () => {
                             >
                                 Edit Profile
                             </Typography>
-                            {photoInputted ? (
+                            {hasInputtedPhoto ? (
                                 <img
-                                    src={userProfilePhoto}
+                                    src={fetchedUserProfilePhoto || "/defaultProfileImage.jpg"}
                                     height={275}
                                     width={275}
-                                    alt={"owner-photo"}
-                                    title={"owner-photo"}
+                                    alt="owner-photo"
+                                    title="owner-photo"
                                     style={{
                                         borderRadius: "50%",
                                         objectFit: "cover",
@@ -291,11 +299,11 @@ const EditProfile = () => {
                                 />
                             ) : (
                                 <img
-                                    src={"/defaultProfileImage.jpg"}
+                                    src="/defaultProfileImage.jpg"
                                     height={275}
                                     width={275}
-                                    alt={"owner-photo"}
-                                    title={"owner-photo"}
+                                    alt="owner-photo"
+                                    title="owner-photo"
                                     style={{
                                         borderRadius: "50%",
                                         objectFit: "cover",
@@ -303,7 +311,6 @@ const EditProfile = () => {
                                     }}
                                 />
                             )}
-
                             <Box
                                 sx={{
                                     display: "flex",
@@ -416,12 +423,12 @@ const EditProfile = () => {
                                         className="imageInput"
                                         sx={{ marginBottom: 2 }}
                                     >
-                                        {!photoInputted
+                                        {!hasInputtedPhoto
                                             ? "Upload profile image"
                                             : "Change uploaded image"}
                                     </Button>
                                 </label>
-                                {photoInputted && (
+                                {hasInputtedPhoto && (
                                     <Typography
                                         variant="body2"
                                         sx={{
