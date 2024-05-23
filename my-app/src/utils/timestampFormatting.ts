@@ -1,5 +1,5 @@
 import moment from "moment";
 
 export const formatTimestamp = (timestamp: string) => {
-    return moment().format("dddd, MMMM Do YYYY");
+    return moment(timestamp).format("dddd, MMMM Do YYYY, h:mm:ss a");
 };
