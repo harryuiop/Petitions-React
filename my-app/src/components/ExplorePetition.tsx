@@ -44,9 +44,10 @@ const ExplorePetition = () => {
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [checked, setChecked] = useState(false);
-    const [openSupportPetitionModal, setOpenSupportPetitionModal] = React.useState(false);
+    const [openSupportPetitionModal, setOpenSupportPetitionModal] = useState(false);
     const [inputtedSupportMessage, setInputtedSupportMessage] = useState("");
     const [inputtedSupportTierId, setInputtedSupportTierId] = useState("");
+    const [openLoginModal, setOpenLoginModal] = useState(false);
 
     const handleOpenDeleteModal = () => setOpenDeleteModal(true);
     const handleCloseDeleteModal = () => setOpenDeleteModal(false);
@@ -309,15 +310,16 @@ const ExplorePetition = () => {
                                 </Box>
                             </>
                         ) : (
-                            <Button
-                                onClick={() => {
-                                    setOpenSupportPetitionModal(true);
-                                }}
-                                sx={{ marginTop: 2 }}
-                            >
-                                Support this petition
-                            </Button>
+                            <></>
                         )}
+                        <Button
+                            onClick={() => {
+                                setOpenSupportPetitionModal(true);
+                            }}
+                            sx={{ marginTop: 2 }}
+                        >
+                            Support this petition
+                        </Button>
                     </Grid>
                     <Grid
                         item
@@ -407,70 +409,127 @@ const ExplorePetition = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Dialog
-                open={openSupportPetitionModal}
-                onClose={handleCloseDeleteModal}
-                fullWidth={true}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{"Support this petition"}</DialogTitle>
-                <DialogContent>
-                    <Box>
-                        <DialogContentText id="alert-dialog-description" sx={{ marginBottom: 1 }}>
-                            Choose a support tier
-                        </DialogContentText>
-                        <FormControl sx={{ minWidth: 250 }}>
-                            <InputLabel id="demo-simple-select-label">Category</InputLabel>
-                            <Select
-                                labelId="category-id"
-                                id="category-id"
-                                value={inputtedSupportTierId}
-                                label="Category"
-                                onChange={(event) => {
-                                    setInputtedSupportTierId(event.target.value);
+            {userAuth.authUser.userId === -1 ? (
+                <>
+                    <Dialog
+                        open={openSupportPetitionModal}
+                        onClose={handleCloseDeleteModal}
+                        fullWidth={true}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle id="alert-dialog-title">{"Support a petition"}</DialogTitle>
+                        <DialogContent>
+                            <Box>
+                                <Typography variant={"subtitle1"}>
+                                    Please sign-in or register to support a petition
+                                </Typography>
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button
+                                onClick={() => {
+                                    setOpenSupportPetitionModal(false);
+                                    setInputtedSupportTierId("");
+                                    setInputtedSupportMessage("");
                                 }}
                             >
-                                {petition.supportTiers.map((tier) => (
-                                    <MenuItem key={tier.title} value={tier.supportTierId}>
-                                        {tier.title}
-                                        {": $" + tier.cost}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <TextField
-                            id="support-tier-desc"
-                            label="Optional Message"
-                            variant="outlined"
-                            value={inputtedSupportMessage}
-                            onChange={(event) => {
-                                setInputtedSupportMessage(event.target.value);
-                            }}
-                            sx={{ marginBottom: 2, minWidth: 250, marginLeft: 1 }}
-                        />
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={() => {
-                            setOpenSupportPetitionModal(false);
-                            setInputtedSupportTierId("");
-                            setInputtedSupportMessage("");
-                        }}
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="info"
+                                onClick={() => {
+                                    navigate("/register");
+                                }}
+                                autoFocus
+                            >
+                                Register
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="info"
+                                onClick={() => {
+                                    navigate("/SignIn");
+                                }}
+                                autoFocus
+                            >
+                                Login
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </>
+            ) : (
+                <>
+                    <Dialog
+                        open={openSupportPetitionModal}
+                        onClose={handleCloseDeleteModal}
+                        fullWidth={true}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
                     >
-                        Cancel
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="success"
-                        onClick={handleSupportConfirm}
-                        autoFocus
-                    >
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                        <DialogTitle id="alert-dialog-title">{"Support this petition"}</DialogTitle>
+                        <DialogContent>
+                            <Box>
+                                <DialogContentText
+                                    id="alert-dialog-description"
+                                    sx={{ marginBottom: 1 }}
+                                >
+                                    Choose a support tier
+                                </DialogContentText>
+                                <FormControl sx={{ minWidth: 250 }}>
+                                    <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                                    <Select
+                                        labelId="category-id"
+                                        id="category-id"
+                                        value={inputtedSupportTierId}
+                                        label="Category"
+                                        onChange={(event) => {
+                                            setInputtedSupportTierId(event.target.value);
+                                        }}
+                                    >
+                                        {petition.supportTiers.map((tier) => (
+                                            <MenuItem key={tier.title} value={tier.supportTierId}>
+                                                {tier.title}
+                                                {": $" + tier.cost}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <TextField
+                                    id="support-tier-desc"
+                                    label="Optional Message"
+                                    variant="outlined"
+                                    value={inputtedSupportMessage}
+                                    onChange={(event) => {
+                                        setInputtedSupportMessage(event.target.value);
+                                    }}
+                                    sx={{ marginBottom: 2, minWidth: 250, marginLeft: 1 }}
+                                />
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button
+                                onClick={() => {
+                                    setOpenSupportPetitionModal(false);
+                                    setInputtedSupportTierId("");
+                                    setInputtedSupportMessage("");
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="success"
+                                onClick={handleSupportConfirm}
+                                autoFocus
+                            >
+                                Confirm
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </>
+            )}
         </>
     );
 };
