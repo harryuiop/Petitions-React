@@ -46,10 +46,9 @@ const CreatePetition = () => {
     const [inputtedSupportTierDescription, setInputtedSupportTierDescription] = useState("");
     const [inputtedSupportTierCost, setInputtedSupportTierCost] = useState("");
     const [fileType, setFileType] = useState("");
-    const [userPetitionPhoto, setUserPetitionPhoto] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [allCategory, setAllCategory] = useState<CategoryRequest[]>([]);
-
+    const [inputtedUserProfilePhoto, setInputtedUserProfilePhoto] = useState<Blob>(new Blob());
     const [openSupporterTierModal, setOpenSupporterTierModal] = useState(false);
     const [errorFlag, setErrorFlag] = useState(false);
     const [imageToRemove, setImageToRemove] = useState(false);
@@ -100,7 +99,7 @@ const CreatePetition = () => {
 
     const handleSubmit = async () => {
         try {
-            if (!photoInputted) {
+            if (!inputtedUserProfilePhoto) {
                 throw new Error("Image must be included");
             }
 
@@ -114,11 +113,7 @@ const CreatePetition = () => {
                 throw new Error("Please add a support tier");
             }
 
-            if (imageToRemove) {
-                setImageToRemove(false);
-            }
-
-            await axios.post(
+            const response = await axios.post(
                 API_BASE_URL + "/petitions",
                 {
                     title: inputtedTitle,
@@ -133,25 +128,37 @@ const CreatePetition = () => {
                 },
             );
 
-            // if (inputtedPetitionPhoto !== "") {
-            //     await axios.post(
-            //         API_BASE_URL + "/petition/" + id + "/image",
-            //         { inputtedPetitionPhoto },
-            //         {
-            //             headers: {
-            //                 "X-Authorization": userAuth.authUser.token,
-            //                 "Content-Type": fileType,
-            //             },
-            //         },
-            //     );
-            // }
-
+            await uploadImage(response.data.petitionId);
             navigate("/");
         } catch (error: any) {
             setErrorMessage("Invalid information");
             setErrorMessage(error.message);
             setSnackbarFailOpen(true);
         }
+    };
+
+    const uploadImage = async (petitionId: string) => {
+        setFileType(inputtedUserProfilePhoto.type);
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            try {
+                const arrayBuffer = reader.result as ArrayBuffer;
+                const uint8Array = new Uint8Array(arrayBuffer);
+
+                await axios.put(API_BASE_URL + "/petitions/" + petitionId + "/image", uint8Array, {
+                    headers: {
+                        "X-Authorization": userAuth.authUser.token,
+                        "Content-Type": inputtedUserProfilePhoto.type,
+                    },
+                });
+            } catch (error: any) {
+                console.error(error.message);
+                setErrorFlag(true);
+                setErrorMessage(error.message);
+            }
+        };
+        reader.readAsArrayBuffer(inputtedUserProfilePhoto);
     };
 
     const handleRemoveImage = async () => {
@@ -161,14 +168,7 @@ const CreatePetition = () => {
     };
 
     const handleImageChange = (event: any) => {
-        const file = event.target.files[0];
-        setFileType(file.type);
-        if (file) {
-            setInputtedPetitionPhoto(file);
-            setPhotoInputted(true);
-            const imageUrl = URL.createObjectURL(file);
-            setUserPetitionPhoto(imageUrl);
-        }
+        setInputtedUserProfilePhoto(event.target.files[0]);
     };
 
     const handleCategorySelection = (event: SelectChangeEvent) => {

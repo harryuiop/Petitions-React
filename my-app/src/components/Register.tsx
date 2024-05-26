@@ -20,6 +20,7 @@ const Register = () => {
     const [inputtedFirstName, setInputtedFirstName] = useState("");
     const [inputtedLastName, setInputtedLastName] = useState("");
     const [fileType, setFileType] = useState("");
+    const [inputtedUserProfilePhoto, setInputtedUserProfilePhoto] = useState<Blob>(new Blob());
 
     const [photoInputted, setPhotoInputted] = useState(false);
     const [emailError, setEmailError] = useState(false);
@@ -27,6 +28,7 @@ const Register = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [passwordVisibility, setPasswordVisibility] = useState(true);
     const [errorFlag, setErrorFlag] = useState(false);
+    const [putImage, setPutImage] = useState(false);
 
     const userAuth = useUserAuthDetailsContext();
 
@@ -35,12 +37,7 @@ const Register = () => {
     }
 
     const handleImageChange = (event: any) => {
-        const file = event.target.files[0];
-        if (file) {
-            setFileType(file.type);
-            setPhotoInputted(true);
-            setInputtedProfilePhoto(file);
-        }
+        setInputtedUserProfilePhoto(event.target.files[0]);
     };
 
     const validateEmailInput = () => {
@@ -77,8 +74,14 @@ const Register = () => {
             setInputtedFirstName("");
             setInputtedEmail("");
             setInputtedPassword("");
-            await logInUser();
-            await sendProfilePhoto(response.data.userId);
+
+            const token: string = await logInUser();
+
+            if (inputtedUserProfilePhoto) {
+                await setProfilePhoto(response.data.userId, token);
+            }
+
+            console.log(putImage);
             setSnackbarSuccessOpen(true);
             localStorage.setItem("isLoggedIn", "true");
             navigate("/");
@@ -101,22 +104,28 @@ const Register = () => {
         }
     };
 
-    const sendProfilePhoto = async (userId: string) => {
-        try {
-            const result = await axios.put(
-                API_BASE_URL + "/users/" + userId + "/image",
-                { inputtedProfilePhoto },
-                {
+    const setProfilePhoto = async (userId: string, token: string) => {
+        setFileType(inputtedUserProfilePhoto.type);
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            try {
+                const arrayBuffer = reader.result as ArrayBuffer;
+                const uint8Array = new Uint8Array(arrayBuffer);
+
+                await axios.put(API_BASE_URL + "/users/" + userId + "/image", uint8Array, {
                     headers: {
-                        "X-Authorization": localStorage.getItem("token"),
-                        "Content-Type": fileType,
+                        "X-Authorization": token,
+                        "Content-Type": inputtedUserProfilePhoto.type,
                     },
-                },
-            );
-        } catch (error: any) {
-            setErrorFlag(true);
-            setErrorMessage(error.toString());
-        }
+                });
+            } catch (error: any) {
+                console.error(error.message);
+                setErrorFlag(true);
+                setErrorMessage(error.message);
+            }
+        };
+        reader.readAsArrayBuffer(inputtedUserProfilePhoto);
     };
 
     const logInUser = async () => {
@@ -138,6 +147,7 @@ const Register = () => {
                     loggedIn: true,
                 });
                 localStorage.setItem("isLoggedIn", "true");
+                return response.data.token;
             }
         } catch (error: any) {
             setErrorFlag(true);

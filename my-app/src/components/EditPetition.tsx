@@ -51,16 +51,15 @@ const EditPetition = () => {
     const [inputtedSupportTierDescription, setInputtedSupportTierDescription] = useState("");
     const [inputtedSupportTierCost, setInputtedSupportTierCost] = useState("");
     const [fileType, setFileType] = useState("");
-    const [userPetitionPhoto, setUserPetitionPhoto] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [allCategory, setAllCategory] = useState<CategoryRequest[]>([]);
     const [petition, setPetition] = useState<PetitionFromGetOne>(defaultPetitionFromGetOne);
+    const [inputtedUserProfilePhoto, setInputtedUserProfilePhoto] = useState<Blob>(new Blob());
 
     const [openSupporterTierModal, setOpenSupporterTierModal] = useState(false);
     const [errorFlag, setErrorFlag] = useState(false);
     const [imageToRemove, setImageToRemove] = useState(false);
     const [photoInputted, setPhotoInputted] = useState(false);
-    const [snackbarFailOpen, setSnackbarFailOpen] = useState(false);
     const [toEdit, setToEdit] = useState(false);
     const [editTitle, setEditTitle] = useState("");
 
@@ -101,7 +100,7 @@ const EditPetition = () => {
                     ...(inputtedTitle !== "" && { title: inputtedTitle }),
                     ...(inputtedDescription !== "" && { description: inputtedDescription }),
                     ...(inputtedCategoryId !== "" && { categoryId: inputtedCategoryId }),
-                }
+                };
 
                 const response = await axios.patch(API_BASE_URL + "/petitions/" + id, requestBody, {
                     headers: {
@@ -109,7 +108,10 @@ const EditPetition = () => {
                         "Content-Type": "application/json",
                     },
                 });
-                console.log(response);
+
+                if (inputtedUserProfilePhoto) {
+                    await uploadImage(petition.petitionId.toString());
+                }
                 navigate("/petition/" + id);
             }
         } catch (error: any) {
@@ -119,6 +121,30 @@ const EditPetition = () => {
         }
     };
 
+    const uploadImage = async (petitionId: string) => {
+        setFileType(inputtedUserProfilePhoto.type);
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            try {
+                const arrayBuffer = reader.result as ArrayBuffer;
+                const uint8Array = new Uint8Array(arrayBuffer);
+
+                await axios.put(API_BASE_URL + "/petitions/" + petitionId + "/image", uint8Array, {
+                    headers: {
+                        "X-Authorization": userAuth.authUser.token,
+                        "Content-Type": inputtedUserProfilePhoto.type,
+                    },
+                });
+            } catch (error: any) {
+                console.error(error.message);
+                setErrorFlag(true);
+                setErrorMessage(error.message);
+            }
+        };
+        reader.readAsArrayBuffer(inputtedUserProfilePhoto);
+    };
+
     const handleRemoveImage = async () => {
         setImageToRemove(true);
         setPhotoInputted(false);
@@ -126,14 +152,7 @@ const EditPetition = () => {
     };
 
     const handleImageChange = (event: any) => {
-        const file = event.target.files[0];
-        setFileType(file.type);
-        if (file) {
-            setInputtedPetitionPhoto(file);
-            setPhotoInputted(true);
-            const imageUrl = URL.createObjectURL(file);
-            setUserPetitionPhoto(imageUrl);
-        }
+        setInputtedUserProfilePhoto(event.target.files[0]);
     };
 
     const handleCategorySelection = (event: SelectChangeEvent) => {

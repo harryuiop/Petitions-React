@@ -31,9 +31,8 @@ const EditProfile = () => {
     const [snackbarSuccessOpen, setSnackbarSuccessOpen] = useState(false);
     const [snackbarFailOpen, setSnackbarFailOpen] = useState(false);
 
-    const [inputtedUserProfilePhoto, setInputtedUserProfilePhoto] = useState<Blob>(new Blob());
+    const [inputtedUserProfilePhoto, setInputtedUserProfilePhoto] = useState("");
     const [fetchedUserProfilePhoto, setFetchedUserProfilePhoto] = useState("");
-    // const [fetchedUserProfilePhoto, setFetchedUserProfilePhoto] = useState<File | null>(null);
     const [hasInputtedPhoto, setHasInputtedPhoto] = useState(false);
     const [fileType, setFileType] = useState("");
     const [inputtedEmail, setInputtedEmail] = useState("");
@@ -44,7 +43,6 @@ const EditProfile = () => {
 
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
-    const [passwordVisibility, setPasswordVisibility] = useState(true);
     const [imageToRemove, setImageToRemove] = useState(false);
 
     if (
@@ -97,7 +95,7 @@ const EditProfile = () => {
         fetchUserInformation();
         fetchUserProfileImage();
         setChecked(true);
-    }, []);
+    }, [inputtedUserProfilePhoto]);
 
     const handleSubmit = async () => {
         try {
@@ -161,7 +159,6 @@ const EditProfile = () => {
         if (!file) {
             return;
         }
-
         setFileType(file.type);
 
         const reader = new FileReader();
@@ -181,7 +178,7 @@ const EditProfile = () => {
                     },
                 );
                 setHasInputtedPhoto(true);
-                setFetchedUserProfilePhoto(file);
+                setInputtedUserProfilePhoto(file);
             } catch (error: any) {
                 console.error(error.message);
                 setErrorFlag(true);
@@ -236,7 +233,6 @@ const EditProfile = () => {
     const handleRemoveImage = async () => {
         setImageToRemove(true);
         setHasInputtedPhoto(false);
-        // setInputtedProfilePhoto("");
     };
 
     const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -406,7 +402,10 @@ const EditProfile = () => {
                                     style={{ display: "none" }}
                                     id="raised-button-file"
                                     type="file"
-                                    onChange={handleImageChange}
+                                    onChange={(event) => {
+                                        handleImageChange(event);
+                                        setHasInputtedPhoto(false);
+                                    }}
                                 />
 
                                 {/* ToDo: Finish the photo implementation */}
@@ -475,7 +474,7 @@ const EditProfile = () => {
                                     severity="success"
                                     sx={{ width: "100%" }}
                                 >
-                                    {"Account Created"}
+                                    {"Account `Create`d"}
                                 </Alert>
                             </Snackbar>
                             <Snackbar
