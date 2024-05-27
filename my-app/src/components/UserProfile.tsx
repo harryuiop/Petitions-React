@@ -21,15 +21,15 @@ const UserProfile = () => {
     const [checked, setChecked] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackMessage, setSnackMessage] = useState("");
-
-    if (
-        userAuth.authUser.userId === -1 ||
-        userAuth.authUser.userId !== parseInt(id as string, 10)
-    ) {
-        navigate("/");
-    }
+    const [publicIds, setPublicIds] = useState<number[]>([]);
 
     useEffect(() => {
+        fetchAllOwnerIds().then((result: any) => {
+            if (userAuth.authUser.userId === -1 || result.contains(userAuth.authUser.userId)) {
+                navigate("/");
+            }
+        });
+
         setUserId(userAuth.authUser.userId);
 
         const ProfileEdited = localStorage.getItem("DetailsUpdated");
@@ -81,6 +81,29 @@ const UserProfile = () => {
         fetchUserProfileImage();
         setChecked(true);
     }, []);
+
+    const fetchAllOwnerIds = async () => {
+        try {
+            const petitionOwnersId = await axios.get(API_BASE_URL + "/petitions");
+            const petitions = petitionOwnersId.data;
+
+            const filteredOwnerIds = petitionOwnersId.data.map((petition: any) => petition.ownerId);
+            const promises = petitions.map(async (petition: any) => {
+                const result = await axios.get(
+                    API_BASE_URL + "v1/petitions/" + petition.petitionId + "/supporters",
+                );
+                return result.data.supporterId;
+            });
+
+            const supporterIds = await Promise.all(promises);
+            const flatSupporterIds = supporterIds.flat();
+
+            return [...filteredOwnerIds, ...flatSupporterIds];
+        } catch (error: any) {
+            setErrorFlag(true);
+            setErrorMessage(error.toString());
+        }
+    };
 
     const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
